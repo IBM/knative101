@@ -3,58 +3,60 @@ Lab instructions for knative101 - Knative on IKS
 
 
 ## Create IBM Cloud Account and Get Cluster
+> If you already have `ibmcloud` installed with the `ibmcloud cs` plugin, you
+> can skip these steps.
 
-## Access the Cluster
-Learn how to set the context to work with your cluster by using the `kubectl` CLI, access the Kubernetes dashboard, and gather basic information about your cluster.
+### Installing the IBM Cloud developer tools
 
-1.  Set the context for your cluster in your CLI. Every time you log in to the IBM Cloud Kubernetes Service CLI to work with the cluster, you must run these commands to set the path to the cluster's configuration file as a session variable. The Kubernetes CLI uses this variable to find a local configuration file and certificates that are necessary to connect with the cluster in IBM Cloud.
+1.  Download and install the `ibmcloud` command line tool:
+    https://console.bluemix.net/docs/cli/index.html#overview
 
-    a. List the available clusters.
-
-    ```shell
-    ibmcloud cs clusters
+1.  Install the `cs` (container-service) plugin:
+    ```bash
+    ibmcloud plugin install container-service -r Bluemix
+    ```
+1.  Authorize `ibmcloud`:
+    ```bash
+    ibmcloud login
     ```
 
-    b. Download the configuration file and certificates for your cluster using the `cluster-config` command.
+### Create a standard cluster
+This lab requires a standard (paid) cluster. Create a new standard cluster from the [IBM Cloud UI](https://console.bluemix.net/containers-kubernetes/catalog/cluster/create).
+1. To ensure the cluster is large enough to host all the Knative and Istio
+components, the recommended configuration for a cluster is:
+  - Kubernetes version 1.10 or later
+  - 4 vCPU nodes with 16GB memory (`b2c.4x16`)
+
+2. It is required to select the worker zone, as well as to create a unique cluster name for your cluster.
+
+3. Click `Create Cluster`.
+
+4. Wait while your cluster is fully deployed. Repeat this command until the state of the cluster is `normal`.
+
+    ```
+    ibmcloud cs clusters | grep $CLUSTER_NAME
+    ```
+
+### Set context for kubectl
+Set the context for your cluster in your CLI.  Every time you log in to the CLI to work with the cluster, you must run this command to set a path to the cluster's configuration file as a session variable. The Kubernetes CLI uses this variable to find a local configuration file and certificates that are necessary to connect with the cluster in IBM Cloud.
+
+1. Download the configuration file and certificates for your cluster using the `cluster-config` command.
 
     ```shell
     ibmcloud cs cluster-config <your_cluster_name>
     ```
 
-    c. Copy and paste the output command from the previous step to set the `KUBECONFIG` environment variable and configure your CLI to run `kubectl` commands against your cluster.
+2. Copy and paste the output command from the previous step to set the `KUBECONFIG` environment variable and configure your CLI to run `kubectl` commands against your cluster.
 
     Example:
     ```shell
     export KUBECONFIG=/Users/user-name/.bluemix/plugins/container-service/clusters/mycluster/kube-config-hou02-mycluster.yml
     ```
 
-2.  Get basic information about your cluster and its worker nodes. This information can help you manage your cluster and troubleshoot issues.
-
-    a.  View details of your cluster.
-
-    ```shell
-    ibmcloud cs cluster-get <your_cluster_name>
-    ```
-
-    b.  Verify the worker nodes in the cluster.
-
-    ```shell
-    ibmcloud cs workers <your_cluster_name>
-    ibmcloud cs worker-get <worker_ID>
-    ```
-
-3.  Validate access to your cluster.
-
-    a.  View nodes in the cluster.
+3. Validate access to your cluster, by viewing nodes in the cluster.
 
     ```shell
     kubectl get node
-    ```
-
-    b.  View services, deployments, and pods.
-
-    ```shell
-    kubectl get svc,deploy,po --all-namespaces
     ```
 
 ## Install Istio, Knative, and Kaniko Build Template

@@ -1,4 +1,4 @@
-# Update Domain Configurations and Ingress Forwarding
+## Update Domain Configurations and Ingress Forwarding
 
 When a Knative application is deployed, Knative will define a URL for your application.  By default, this url is "default.example.com." Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own hostname.
 

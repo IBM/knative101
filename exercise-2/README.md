@@ -1,4 +1,4 @@
-# Clone the lab repo & Provide Container Registry Credentials
+## Clone the lab repo & Provide Container Registry Credentials
 
 ### Clone the lab repo
 The application for this lab is a simple node.js with express app which returns the first n numbers of the fibonacci sequence.  To use the app, host it, and simply make a POST request to the `/fib` endpoint with the JSON data: `{"number":10}`

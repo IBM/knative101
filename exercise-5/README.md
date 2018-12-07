@@ -1,4 +1,5 @@
 ## Deploy vnext version using Knctl
+
 Did you notice that the fibonacci sequence started with 1? Some would argue that the sequence should actually start with 0, 1, 1, 2.  There's a vnext version of the application living in the vnext branch in the github project.  We'll deploy that as v2 of our app, but instead of using kubectl, let's try a new tool.
 
 knctl is a new Knative CLI providing a simple set of commands to interact with a Knative installation.  Let's try it out.

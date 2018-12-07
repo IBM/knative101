@@ -1,4 +1,5 @@
 ## Update Domain Configurations and Ingress Forwarding
+
 When a Knative application is deployed, Knative will define a URL for your application.  By default, this url is "default.example.com." Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own hostname.
 
 What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an external domain when we created our cluster.  We'll first get that URL, tell Knative to assign new applications to that URL, and then forward requests to our Ingress Subdomain to the Knative Istio Gateway.

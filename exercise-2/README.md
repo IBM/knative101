@@ -1,7 +1,7 @@
 ## Clone the Lab Repo & Provide Container Registry Credentials
 
 ### Clone the lab repo
-The application for this lab is a simple node.js with express app which returns the first n numbers of the fibonacci sequence.  To use the app, host it, and simply make a POST request to the `/fib` endpoint with the JSON data: `{"number":10}`
+The application for this lab is a simple node.js with express app which returns the first n numbers of the fibonacci sequence. To use the app, host it, and simply make a POST request to the `/fib` endpoint with the JSON data: `{"number":10}`
 
 1. Clone the git repository:
 
@@ -16,7 +16,7 @@ The application for this lab is a simple node.js with express app which returns 
 
 
 ### Provide Container Registry Credentials
-This lab will need credentials for authenticating to your container registry - we'll be using dockerhub.  You could also use the IBM Container Registry. First, we'll need to create a `Secret` to store the credentials.
+This lab will need credentials for authenticating to your container registry - we'll be using dockerhub. You could also use the IBM Container Registry. First, we'll need to create a `Secret` to store the credentials.
 
 A `Secret` is a Kubernetes object containing sensitive data such as a password, a token, or a key. You can also read more about [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/).
 
@@ -38,7 +38,7 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 
 A `Service Account` provides an identity for processes that run in a Pod. This Service Account will be used to link the build process for Knative to the Secret you created earlier.
 
-1.  Apply the service account to your cluster:
+1. Apply the service account to your cluster:
 
 	```
 	kubectl apply --filename service-account.yaml

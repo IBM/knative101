@@ -4,14 +4,14 @@ If you already have `ibmcloud` installed with the `ibmcloud cs` plugin, you can 
 
 ### Installing the IBM Cloud developer tools
 
-1.  Download and install the `ibmcloud` command line tool:
+1. Download and install the `ibmcloud` command line tool:
     https://console.bluemix.net/docs/cli/index.html#overview
 
-1.  Install the `cs` (container-service) plugin:
+1. Install the `cs` (container-service) plugin:
     ```bash
     ibmcloud plugin install container-service -r Bluemix
     ```
-1.  Authorize `ibmcloud`:
+1. Authorize `ibmcloud`:
     ```bash
     ibmcloud login
     ```
@@ -34,7 +34,7 @@ components, the recommended configuration for a cluster is:
     ```
 
 ### Set context for kubectl
-Set the context for your cluster in your CLI.  Every time you log in to the CLI to work with the cluster, you must run this command to set a path to the cluster's configuration file as a session variable. The Kubernetes CLI uses this variable to find a local configuration file and certificates that are necessary to connect with the cluster in IBM Cloud.
+Set the context for your cluster in your CLI. Every time you log in to the CLI to work with the cluster, you must run this command to set a path to the cluster's configuration file as a session variable. The Kubernetes CLI uses this variable to find a local configuration file and certificates that are necessary to connect with the cluster in IBM Cloud.
 
 1. Download the configuration file and certificates for your cluster using the `cluster-config` command.
 

@@ -11,3 +11,5 @@ You'll learn to deploy applications using kubectl and a configuration yaml file,
 You'll also learn to work with revisions and routes, sending some percentage of your traffic to a new revision.
 
 ## License
+
+[License](LICENSE)

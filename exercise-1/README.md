@@ -1,4 +1,3 @@
-
 ## Install Istio, Knative, and Kaniko Build Template
 
 Knative is currently built on top of both Kubernetes and Istio.  You will need to install Istio.

@@ -162,20 +162,20 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 1. Update the forward-ingress.yaml file with your own ingress subdomain, prepended with fib-knative, or whatever subdomain you would like your application to live at.  The file should look something like:
 
 	```yaml
-	  apiVersion: extensions/v1beta1
-	  kind: Ingress
-	  metadata:
-	    name: iks-knative-ingress
-	    namespace: istio-system
-	    spec:
-	      rules:
-	        - host: fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud
-	          http:
-	            paths:
-	              - path: /
-	                backend:
-	                  serviceName: knative-ingressgateway
-	                  servicePort: 80
+  apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    name: iks-knative-ingress
+    namespace: istio-system
+    spec:
+      rules:
+        - host: fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud
+          http:
+            paths:
+              - path: /
+                backend:
+                  serviceName: knative-ingressgateway
+                  servicePort: 80
 	```
 
 2. Apply the ingress rule.

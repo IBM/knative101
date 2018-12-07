@@ -12,4 +12,4 @@ You'll also learn to work with revisions and routes, sending some percentage of 
 
 ## License
 
-[License](LICENSE)
+[License](./LICENSE.txt)

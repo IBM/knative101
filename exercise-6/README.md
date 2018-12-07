@@ -8,6 +8,18 @@ Maybe we want to slowly roll over from our old version to the new version, or do
 	knctl route list
 	```
 
+  Output:
+  ```
+  Routes in namespace 'default'
+
+  Name         Domain                                                              Traffic                   Annotations  Conditions  Age  
+  fib-knative  fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  100% -> fib-knative-00001  -            3 OK / 3    20h  
+
+  1 routes
+
+  Succeeded
+  ```
+
 2. Send 50% of the traffic to the latest revision, and 50% to the previous revision:
 
 	```
@@ -19,6 +31,18 @@ Maybe we want to slowly roll over from our old version to the new version, or do
 	```
 	knctl route list
 	```
+
+  Output:
+  ```
+  Routes in namespace 'default'
+
+  Name         Domain                                                              Traffic                   Annotations  Conditions  Age  
+  fib-knative  fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  50% -> fib-knative-00002  -            3 OK / 3    20h  
+                                                                                   50% -> fib-knative-00001                             
+  1 routes
+
+  Succeeded
+```
 
 3. Let's run some load against the app, just asking for the first number in the fibonacci sequence so that we can clearly see which revision is being called.
 

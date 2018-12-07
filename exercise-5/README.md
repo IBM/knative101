@@ -35,3 +35,16 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
 	```
 	knctl revisions list
 	```
+
+  Output:
+  ```
+  Revisions
+
+  Service      Name               Tags      Annotations  Conditions  Age  Traffic  
+  fib-knative  fib-knative-00002  latest    -            5 OK / 5    20h  50% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
+  ~            fib-knative-00001  previous  -            5 OK / 5    20h  50% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
+
+  2 revisions
+
+  Succeeded
+```

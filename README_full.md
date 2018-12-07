@@ -138,7 +138,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 	```
 
 
-## Deploy app using Kubectl and service.yaml
+## Deploy app using kubectl and service.yaml
 Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a docker image built on cluster (using the Kaniko build template, to a docker image pushed to dockerhub, and ultimately a URL to access our application.
 
 1. Edit the service.yaml file to point to your own container registry.
@@ -168,7 +168,7 @@ Let's get our first Knative application up & running. Using the Build & Serving 
 
 8. Run `kubectl get pods --watch` and wait to see the application scale itself back down to 0.
 
-## Deploy vnext version using Knctl
+## Deploy vnext version using knctl
 Did you notice that the fibonacci sequence started with 1? Some would argue that the sequence should actually start with 0, 1, 1, 2.  There's a vnext version of the application living in the vnext branch in the github project.  We'll deploy that as v2 of our app, but instead of using kubectl, let's try a new tool.
 
 knctl is a new Knative CLI providing a simple set of commands to interact with a Knative installation.  Let's try it out.
@@ -206,7 +206,7 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
 	```
 
 
-## Canary Testing with Knctl
+## Canary Testing with knctl
 Maybe we want to slowly roll over from our old version to the new version, or do some AB testing of the new version. We can use the knctl rollout command to route traffic percentages to our revisions.
 
 1. Check the current route percentages:
@@ -240,7 +240,5 @@ At this point, you should feel that you've gotten a whirlwind tour of knative an
 
 
 TODO:
-- remove steps from access clusters
-- Kaniko bulid Template
 - show more output from knctl & kubectl commands
 - add cleanup section at bottom

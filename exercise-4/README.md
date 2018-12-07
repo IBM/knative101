@@ -1,4 +1,4 @@
-## Deploy app using Kubectl and service.yaml
+# Deploy app using Kubectl and service.yaml
 
 Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a docker image built on cluster (using the Kaniko build template, to a docker image pushed to dockerhub, and ultimately a URL to access our application.
 

@@ -1,6 +1,6 @@
 * [Create IBM Cloud Account and Get Cluster](exercise-0/README.md)
 * [Install Istio, Knative, and Kaniko Build Template](exercise-1/README.md)
-* [Clone the lab repo & Provide Container Registry Credentials](exercise-2/README.md)
+* [Clone the Lab Repo & Provide Container Registry Credentials](exercise-2/README.md)
 * [Update Domain Configurations and Ingress Forwarding](exercise-3/README.md)
 * [Deploy fibonacci app using Kubectl and service.yaml](exercise-4/README.md)
 * [Deploy vnext version using Knctl](exercise-5/README.md)

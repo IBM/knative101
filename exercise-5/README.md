@@ -42,7 +42,7 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
 
   Service      Name               Tags      Annotations  Conditions  Age  Traffic  
   fib-knative  fib-knative-00002  latest    -            5 OK / 5    20h  100% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
-  ~            fib-knative-00001  previous  -            5 OK / 5    20h  0%
+  ~            fib-knative-00001  previous  -            5 OK / 5    20h  -
 
   2 revisions
 

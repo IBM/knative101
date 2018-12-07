@@ -21,7 +21,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 
 ### Forward requests coming into IKS ingress to the Knative Istio Gateway
 
-1. Update the forward-ingress.yaml file with your own ingress subdomain, prepended with fib-knative, or whatever subdomain you would like your application to live at. The file should look something like:
+1. Update the forward-ingress.yaml file with your own ingress subdomain, prepended with `fib-knative.default`, or whatever subdomain you would like your application to live at. The file should look something like:
 
 	```yaml
   apiVersion: extensions/v1beta1

@@ -25,6 +25,6 @@ Let's get our first Knative application up & running. Using the Build & Serving 
 	kubectl edit cm config-autoscaler --namespace knative-serving
 	```
 
-7. Find `scale-to-zero-threshold`, and decrease the time from 5m to 1m. You can also decrease the `scale-to-zero-graceperiod`.
+7. Find `scale-to-zero-threshold`, and decrease the time from 5m to 1m. You can also decrease the `scale-to-zero-grace-period`.
 
 8. Run `kubectl get pods --watch` and wait to see the application scale itself back down to 0.

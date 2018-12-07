@@ -46,7 +46,7 @@ Set the context for your cluster in your CLI.  Every time you log in to the CLI 
 
     Example:
     ```shell
-    export KUBECONFIG=/Users/user-name/.bluemix/plugins/container-service/clusters/mycluster/kube-config-hou02-mycluster.yml
+    export KUBECONFIG=/Users...
     ```
 
 3. Validate access to your cluster, by viewing nodes in the cluster.

@@ -240,5 +240,4 @@ At this point, you should feel that you've gotten a whirlwind tour of knative an
 
 
 TODO:
-- show more output from knctl & kubectl commands
 - add cleanup section at bottom

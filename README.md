@@ -202,10 +202,7 @@ Let's get our first Knative application up & running. Using the Build & Serving 
 5. Now that the app is up, we should be able to call it using a number input.  We can do that using a curl command against the URL provided us:
 
 	```
-	curl -X POST \
-  http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib \
-  -H 'Content-Type: application/json' \
-  -d '{"number":20}'
+	curl -X POST http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -H 'Content-Type: application/json' -d '{"number":20}'
 	```
 
 6. If we left this alone for some time, it would scale itself back down to 0, and terminate the pods that were created.  The default for knative scale-to-zero is 5 minutes.  Let's decrease this time by editing the autoscaler:
@@ -280,10 +277,17 @@ Maybe we want to slowly roll over from our old version to the new version, or do
 3. Let's run some load against the app, just asking for the first number in the fibonacci sequence so that we can clearly see which revision is being called.
 
 	```
-	while sleep 0.5; do curl -X POST "http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib" -H 'Content-Type: application/json'   -d '{"number":1}' ; done
+	while sleep 0.5; do curl -X POST http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib" -H 'Content-Type: application/json'   -d '{"number":1}' ; done
 	```
 
 4. We should see that the curl requests are routed approximately 50/50 between the two applications. Let's kill this process using ctrl-c.
 
 
 At this point, you should feel that you've gotten a whirlwind tour of knative and knctl.  Please reach out should you have any questions or issues going through this lab!
+
+
+TODO:
+- remove steps from access clusters
+- Kaniko bulid Template
+- show more output from knctl & kubectl commands
+- add cleanup section at bottom

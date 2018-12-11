@@ -1,7 +1,7 @@
 ## Clone the Lab Repo & Provide Container Registry Credentials
 
 ### Clone the lab repo
-The application for this lab is a simple node.js with express app which returns the first n numbers of the fibonacci sequence. To use the app, host it, and simply make a POST request to the `/fib` endpoint with the JSON data: `{"number":10}`
+The application for this lab is a simple node.js with express app which returns the first n numbers of the Fibonacci sequence. To use the app, host it, and simply make a POST request to the `/fib` endpoint with the JSON data: `{"number":10}`
 
 1. Clone the git repository:
 
@@ -33,8 +33,28 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 
 	```
 	kubectl apply --filename docker-secret.yaml
-
 	```
+
+	View the yaml file used create the Secret:
+	```
+	kubectl get secret basic-user-pass -o yaml
+	```
+
+	Example output:
+	```yaml
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: basic-user-pass
+    annotations:
+      build.knative.dev/docker-0: https://index.docker.io/v1/
+  type: kubernetes.io/basic-auth
+  data:
+    # Use 'echo -n "username" | base64' to generate this string
+    username: your_base_64_username
+    # Use 'echo -n "password" | base64' to generate this string
+    password: your_base_64_password
+  ```
 
 A `Service Account` provides an identity for processes that run in a Pod. This Service Account will be used to link the build process for Knative to the Secret you created earlier.
 
@@ -44,4 +64,19 @@ A `Service Account` provides an identity for processes that run in a Pod. This S
 	kubectl apply --filename service-account.yaml
 	```
 
-In exercise 4, you will build & deploy this app. The goal of this exercise was to set up the credentials for your app.
+	View the yaml file used to create the Service Account:
+	```
+	kubectl get serviceaccount default -o yaml
+	```
+
+	Example output:
+	```yaml
+  apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: build-bot
+  secrets:
+  - name: basic-user-pass
+  ```
+
+Congratulations! You've set up some required credentials for the Knative build process to have access to push to your container registry. In the next exercise, you will build & deploy this app. The goal of this exercise was to set up the credentials for your app.

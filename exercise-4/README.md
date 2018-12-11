@@ -1,30 +1,55 @@
-## Deploy Fibonacci App Using kubectl and service.yaml
+## Deploy vnext Version Using knctl
 
-Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a docker image built on cluster (using the Kaniko build template), to a docker image pushed to dockerhub, and ultimately a URL to access our application.
+Did you notice that the Fibonacci sequence started with 1? Most would argue that the sequence should actually start with 0. There's a vnext version of the application at the vnext branch in the github project. We'll deploy that as v2 of our app, but instead of using kubectl, let's try a new tool.
 
-1. Edit the service.yaml file to point to your own container registry.
+knctl is a new Knative CLI providing a simple set of commands to interact with a Knative installation. Let's try it out.
 
-2. Apply the service.yaml file to you cluster.
+### Installing knctl
+1. Install knctl using one of the prebuilt binaries from their [release page](https://github.com/cppforlife/knctl/releases), and run the following commands:
 
-	```
-	kubectl apply -f service.yaml
-	```
-3. Run `kubectl get pods --watch` to see the pods initializing.
+  ```
+  shasum -a 265 ~/Downloads/knctl-*
+  # Compare checksum output to what's included in the release notes
 
-4. Once all the pods are initialized, go to dockerhub to see that your container image was built and pushed to dockerhub.
+  mv ~/Downloads/knctl-* /usr/local/bin/knctl
 
-5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided us:
+  chmod +x /usr/local/bin/knctl
+  ```
 
-	```
-	curl -X POST http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -H 'Content-Type: application/json' -d '{"number":20}'
-	```
-
-6. If we left this alone for some time, it would scale itself back down to 0, and terminate the pods that were created. The default for Knative scale-to-zero is 5 minutes. Let's decrease this time by editing the autoscaler:
+### Deploy vnext
+1. Let's deploy vnext, but instead of kubectl with the service.yaml file, let's use knctl. By providing Knative with the source of our app and the image to push to dockerhub, we'll get an application with a URL we can access.
 
 	```
-	kubectl edit cm config-autoscaler --namespace knative-serving
+	knctl deploy \
+	    --service fib-knative \
+	    --git-url https://github.com/beemarie/fib-knative \
+	    --git-revision vnext \
+	    --service-account build-bot \
+	    --image index.docker.io/beemarie/fib-knative:vnext \
+	    --managed-route=false
+	```
+	This command will tell Knative to go out to github, find my code, build it into a container, and push that conatiner to dockerhub. One thing you'll notice if you follow the output logs is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
+
+2. See the revisions using knctl.
+
+	```
+	knctl revisions list
 	```
 
-7. Find `scale-to-zero-threshold`, and decrease the time from 5m to 1m. You can also decrease the `scale-to-zero-grace-period`.
+  Output:
+  ```
+  Revisions
 
-8. Run `kubectl get pods --watch` and wait to see the application scale itself back down to 0.
+  Service      Name               Tags      Annotations  Conditions  Age  Traffic  
+  fib-knative  fib-knative-00002  latest    -            5 OK / 5    20h  100% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
+  ~            fib-knative-00001  previous  -            5 OK / 5    20h  -
+
+  2 revisions
+
+  Succeeded
+  ```
+3. Curl the application to see that 100% of the traffic is hitting your new fib-knative revision, starting the sequence with 0.
+
+  ```
+  curl -X POST http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -H 'Content-Type: application/json' -d '{"number":3}'
+  ```

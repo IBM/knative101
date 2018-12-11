@@ -1,50 +1,57 @@
-## Deploy vnext Version Using knctl
+## A/B Testing with knctl
 
-Did you notice that the fibonacci sequence started with 1? Some would argue that the sequence should actually start with 0, 1, 1, 2. There's a vnext version of the application living in the vnext branch in the github project. We'll deploy that as v2 of our app, but instead of using kubectl, let's try a new tool.
+Maybe we want to slowly roll users over from our old version to the new version, or do some A/B testing of the new version. We can use the knctl rollout command to route traffic percentages to our revisions.
 
-knctl is a new Knative CLI providing a simple set of commands to interact with a Knative installation. Let's try it out.
-
-### Installing knctl
-1. Install knctl using one of the prebuilt binaries from their [release page](https://github.com/cppforlife/knctl/releases), and run the following commands:
-
-  ```
-  shasum -a 265 ~/Downloads/knctl-*
-  # Compare checksum output to what's included in the release notes
-
-  mv ~/Downloads/knctl-* /usr/local/bin/knctl
-
-  chmod +x /usr/local/bin/knctl
-  ```
-
-### Deploy vnext
-1. We can deploy vnext in the same way as we did with kubectl with the service.yaml configuration file, except this time we'll use knctl. By providing Knative with the source of our app and the image to push to dockerhub, we'll get an application with a URL we can access.
+1. Check the current route percentages:
 
 	```
-	knctl deploy \
-	    --service fib-knative \
-	    --git-url https://github.com/beemarie/fib-knative \
-	    --git-revision vnext \
-	    --service-account build-bot \
-	    --image index.docker.io/beemarie/fib-knative:vnext \
-	    --managed-route=false
-	```
-	This command will tell Knative to go out to github, find my code, build it into a container, and push that conatiner to dockerhub. One thing you'll notice is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
-
-2. See the revisions using knctl.
-
-	```
-	knctl revisions list
+	knctl route list
 	```
 
   Output:
   ```
-  Revisions
+  Routes in namespace 'default'
 
-  Service      Name               Tags      Annotations  Conditions  Age  Traffic  
-  fib-knative  fib-knative-00002  latest    -            5 OK / 5    20h  100% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
-  ~            fib-knative-00001  previous  -            5 OK / 5    20h  -
+  Name         Domain                                                              Traffic                   Annotations  Conditions  Age  
+  fib-knative  fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  100% -> fib-knative  -            3 OK / 3    20h  
 
-  2 revisions
+  1 routes
 
   Succeeded
+  ```
+
+2. Send 50% of the traffic to the latest revision, and 50% to the previous revision:
+
+	```
+	knctl rollout --route fib-knative -p fib-knative:latest=50% -p fib-knative:previous=50%
+	```
+
+3. Check the route percentages to confirm they've updated:
+
+	```
+	knctl route list
+	```
+
+  Output:
+  ```
+	Routes in namespace 'default'
+
+	Name         Domain                                                                       Traffic                   Annotations  Conditions  Age  
+	fib-knative  fib-knative.default.bmv-knative-101-test.us-east.containers.appdomain.cloud  50% -> fib-knative-00002  -            3 OK / 3    9m  
+	                                                                                          50% -> fib-knative-00001                             
+
+	1 routes
+
+	Succeeded
 ```
+
+3. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called.
+
+	```
+	while sleep 0.5; do curl -X POST "http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib" -H 'Content-Type: application/json'   -d '{"number":1}' ; done
+	```
+
+4. We should see that the curl requests are routed approximately 50/50 between the two applications. Let's kill this process using ctrl-c.
+
+
+At this point, you should feel that you've gotten a whirlwind tour of Knative. Please reach out should you have any questions or issues going through this lab!

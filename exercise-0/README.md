@@ -49,7 +49,7 @@ Set the context for your cluster in your CLI. Every time you log in to the CLI t
     export KUBECONFIG=/Users...
     ```
 
-3. Validate access to your cluster, by viewing nodes in the cluster.
+3. Validate access to your cluster by viewing the nodes in the cluster.
 
     ```shell
     kubectl get node

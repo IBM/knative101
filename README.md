@@ -8,7 +8,7 @@ Serving supports serving your applications, managing traffic, as well as routing
 
 Two of the key Knative personas are Developers and platform providers. Developers can use Knative directly (or through an API) to build Serverless applications on top of Kubernetes.  Platform providers can use the Knative primitives to build their own Serverless platform on Kubernetes.
 
-![knative personas](https://raw.githubusercontent.com/knative/docs/master/images/knative-audience.svg?sanitize=true | width=300)
+![knative personas](README_images/audience.png)
 
 The Knative application you'll create is a fibonacci sequence app. When provided with the number n, it will return the first n numbers of the fibonacci sequence: 1, 1, 2, 3.... You'll also deploy a vnext of the application, which starts the fibonacci sequence with 0 instead of 1: 0, 1, 1, 2, 3.... The application will be given a domain from Knative, which you'll configure to be the same host as your IKS ingress subdomain. You will then forward incoming requests from that IKS cluster subdomain to the Knative gateway, which will then route requests to your application.
 

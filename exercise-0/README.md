@@ -8,10 +8,12 @@ If you already have `ibmcloud` installed with the `ibmcloud cs` plugin, you can 
     https://console.bluemix.net/docs/cli/index.html#overview
 
 1. Install the `cs` (container-service) plugin:
+
     ```
     ibmcloud plugin install container-service -r Bluemix
     ```
 1. Authorize `ibmcloud`:
+
     ```
     ibmcloud login
     ```

@@ -71,7 +71,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us:
 
 	```
-	curl -X POST http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -H 'Content-Type: application/json' -d '{"number":20}'
+	curl -X POST http://fib-knative.default.<your-ingress-subdomain>/fib -H 'Content-Type: application/json' -d '{"number":20}'
 	```
 6. You should see the first 20 Fibonacci numbers!
 

@@ -17,7 +17,7 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
   ```
 
 ### Deploy vnext
-1. We can deploy vnext in the same way as we did with kubectl with the service.yaml configuration file, except this time we'll use knctl. By providing knative with the source of our app and the image to push to dockerhub, we'll get an application with a URL we can access.
+1. We can deploy vnext in the same way as we did with kubectl with the service.yaml configuration file, except this time we'll use knctl. By providing Knative with the source of our app and the image to push to dockerhub, we'll get an application with a URL we can access.
 
 	```
 	knctl deploy \
@@ -28,7 +28,7 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
 	    --image index.docker.io/beemarie/fib-knative:vnext \
 	    --managed-route=false
 	```
-	This command will tell knative to go out to github, find my code, build it into a container, and push that conatiner to dockerhub. One thing you'll notice is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
+	This command will tell Knative to go out to github, find my code, build it into a container, and push that conatiner to dockerhub. One thing you'll notice is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
 
 2. See the revisions using knctl.
 

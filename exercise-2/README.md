@@ -23,9 +23,9 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 1. To create this object, we'll first need to base64 encode our username and password for dockerhub.
 
 	```
-	echo -n "username" | base64 -b 0
+	echo -n "username" | base64
 
-	echo -n "password" | base64 -b 0
+	echo -n "password" | base64
 	```
 
 2. Update the `docker-secret.yaml` file with your base64 encoded username and password.
@@ -43,3 +43,5 @@ A `Service Account` provides an identity for processes that run in a Pod. This S
 	```
 	kubectl apply --filename service-account.yaml
 	```
+
+In exercise 4, you will build & deploy this app. The goal of this exercise was to set up the credentials for your app.

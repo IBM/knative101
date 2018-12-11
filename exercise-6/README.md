@@ -1,6 +1,6 @@
 ## A/B Testing with knctl
 
-Maybe we want to slowly roll over from our old version to the new version, or do some AB testing of the new version. We can use the knctl rollout command to route traffic percentages to our revisions.
+Maybe we want to slowly roll users over from our old version to the new version, or do some AB testing of the new version. We can use the knctl rollout command to route traffic percentages to our revisions.
 
 1. Check the current route percentages:
 
@@ -54,4 +54,4 @@ Maybe we want to slowly roll over from our old version to the new version, or do
 4. We should see that the curl requests are routed approximately 50/50 between the two applications. Let's kill this process using ctrl-c.
 
 
-At this point, you should feel that you've gotten a whirlwind tour of knative and knctl. Please reach out should you have any questions or issues going through this lab!
+At this point, you should feel that you've gotten a whirlwind tour of Knative and knctl. Please reach out should you have any questions or issues going through this lab!

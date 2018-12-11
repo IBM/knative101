@@ -2,7 +2,7 @@
 
 Knative is currently built on top of both Kubernetes and Istio. You will need to install Istio.
 
-0. Install Istio’s Custom Resource Definitions via kubectl apply, and wait a few seconds for the CRDs to be committed in the kube-apiserver:
+0. A Custom Resource Definition enables you to create custom resources, extensions to the Kubernetes API, on your kubernetes cluster. Istio needs these CRDs to be created before we can install.  Install Istio’s CRDs via kubectl apply, and wait a few seconds for the CRDs to be committed in the kube-apiserver. 
 
 	```
 	kubectl apply -f https://github.com/knative/serving/releases/download/v0.2.2/istio-crds.yaml

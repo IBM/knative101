@@ -8,7 +8,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 1. First, let's get our ingress subdomain for our cluster.
 
 	```
-	ibmcloud ks cluster-get my-cluster-name
+	ibmcloud ks cluster-get <my-cluster-name>
 	```
 
 2. Next, update the default URL for new Knative apps by editing the configuration:

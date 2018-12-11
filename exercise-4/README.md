@@ -1,6 +1,6 @@
 ## Deploy Fibonacci App Using kubectl and service.yaml
 
-Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a docker image built on cluster (using the Kaniko build template, to a docker image pushed to dockerhub, and ultimately a URL to access our application.
+Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a docker image built on cluster (using the Kaniko build template), to a docker image pushed to dockerhub, and ultimately a URL to access our application.
 
 1. Edit the service.yaml file to point to your own container registry.
 
@@ -19,7 +19,7 @@ Let's get our first Knative application up & running. Using the Build & Serving 
 	curl -X POST http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -H 'Content-Type: application/json' -d '{"number":20}'
 	```
 
-6. If we left this alone for some time, it would scale itself back down to 0, and terminate the pods that were created. The default for knative scale-to-zero is 5 minutes. Let's decrease this time by editing the autoscaler:
+6. If we left this alone for some time, it would scale itself back down to 0, and terminate the pods that were created. The default for Knative scale-to-zero is 5 minutes. Let's decrease this time by editing the autoscaler:
 
 	```
 	kubectl edit cm config-autoscaler --namespace knative-serving

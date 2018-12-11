@@ -59,6 +59,7 @@ After installing Istio, you can install Knative. For this lab, we will install b
 	```
 As a part of this lab, we will use the kaniko build template for building source into a container image from a Dockerfile, inside a container or a Kubernetes cluster. Typically, to build a container image, it is required to run a Docker daemon with root access. According to the [Kaniko github project](https://github.com/GoogleContainerTools/kaniko), "Kaniko doesn't depend on a Docker daemon and executes each command within a Dockerfile completely in userspace. This enables building container images in environments that can't easily or securely run a Docker daemon, such as a standard Kubernetes cluster."
 
+
 1. Install the kaniko build template to your cluster.
 
   ```

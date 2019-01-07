@@ -59,7 +59,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 
 1. Edit the `service.yaml` file to point to your own container registry.
 
-2. Apply the `service.yaml` file to you cluster.
+2. Apply the `service.yaml` file to your cluster.
 
 	```
 	kubectl apply -f service.yaml

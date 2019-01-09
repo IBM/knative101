@@ -31,52 +31,53 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 2. Update the `docker-secret.yaml` file with your base64 encoded username and password.
 3. Apply the secret to your cluster:
 
-	```
-	kubectl apply --filename docker-secret.yaml
-	```
+      ```
+      kubectl apply --filename docker-secret.yaml
+      ```
 
-	View the yaml file used create the Secret:
-	```
-	kubectl get secret basic-user-pass -o yaml
-	```
+      View the yaml file used create the Secret:
+      ```
+      kubectl get secret basic-user-pass -o yaml
+      ```
 
-	Example output:
-	```yaml
-  apiVersion: v1
-  kind: Secret
-  metadata:
-    name: basic-user-pass
-    annotations:
-      build.knative.dev/docker-0: https://index.docker.io/v1/
-  type: kubernetes.io/basic-auth
-  data:
-    # Use 'echo -n "username" | base64' to generate this string
-    username: your_base_64_username
-    # Use 'echo -n "password" | base64' to generate this string
-    password: your_base_64_password
-  ```
+      Example output:
 
+      ```yaml
+      apiVersion: v1
+        kind: Secret
+        metadata:
+          name: basic-user-pass
+          annotations:
+            build.knative.dev/docker-0: https://index.docker.io/v1/
+        type: kubernetes.io/basic-auth
+        data:
+          # Use 'echo -n "username" | base64' to generate this string
+          username: your_base_64_username
+          # Use 'echo -n "password" | base64' to generate this string
+          password: your_base_64_password
+      ```
 A `Service Account` provides an identity for processes that run in a Pod. This Service Account will be used to link the build process for Knative to the Secret you created earlier.
 
-1. Apply the service account to your cluster:
+4. Apply the service account to your cluster:
 
-	```
-	kubectl apply --filename service-account.yaml
-	```
+    ```
+    kubectl apply --filename service-account.yaml
+    ```
 
-	View the yaml file used to create the Service Account:
-	```
-	kubectl get serviceaccount default -o yaml
-	```
+    View the yaml file used to create the Service Account:
+    ```
+    kubectl get serviceaccount default -o yaml
+    ```
 
-	Example output:
-	```yaml
-  apiVersion: v1
-  kind: ServiceAccount
-  metadata:
-    name: build-bot
-  secrets:
-  - name: basic-user-pass
-  ```
+    Example output:
+    ```yaml
+       apiVersion: v1
+     kind: ServiceAccount
+     metadata:
+       name: build-bot
+     secrets:
+     - name: basic-user-pass
+    ```
+
 
 Congratulations! You've set up some required credentials for the Knative build process to have access to push to your container registry. In the next exercise, you will build & deploy this app. The goal of this exercise was to set up the credentials for your app.

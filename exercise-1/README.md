@@ -41,26 +41,27 @@ After installing Istio, you can install Knative. For this lab, we will install b
 2. Monitor the Knative components until all of the components show a `STATUS` of `Running` or `Completed`:
 
 	Commands:
-	```
-	kubectl get pods --namespace knative-serving
-	kubectl get pods --namespace knative-build
-  ```
+    ```
+    kubectl get pods --namespace knative-serving
+    kubectl get pods --namespace knative-build
+    ```
+    Example Ouput:
 
-	Example Ouput:
-	```
-	NAME                          READY   STATUS    RESTARTS   AGE
-	activator-df78cb6f9-jpvs7     2/2     Running   0          38s
-	activator-df78cb6f9-nhzhf     2/2     Running   0          37s
-	activator-df78cb6f9-qjg8w     2/2     Running   0          37s
-	autoscaler-6fccb66768-m4f2q   2/2     Running   0          37s
-	controller-56cf5965f5-8pwcg   1/1     Running   0          35s
-	webhook-5dcbf967cd-lxzmk      1/1     Running   0          35s
-	```
-	```
-	NAME                                READY   STATUS    RESTARTS   AGE
-	build-controller-747b8fd966-4n8b2   1/1     Running   0          47s
-	build-webhook-6dc78d8f6d-gsm4k      1/1     Running   0          47s
-	```
+    ```
+    NAME                          READY   STATUS    RESTARTS   AGE
+    activator-df78cb6f9-jpvs7     2/2     Running   0          38s
+    activator-df78cb6f9-nhzhf     2/2     Running   0          37s
+    activator-df78cb6f9-qjg8w     2/2     Running   0          37s
+    autoscaler-6fccb66768-m4f2q   2/2     Running   0          37s
+    controller-56cf5965f5-8pwcg   1/1     Running   0          35s
+    webhook-5dcbf967cd-lxzmk      1/1     Running   0          35s
+    ```
+
+    ```
+    NAME                                READY   STATUS    RESTARTS   AGE
+    build-controller-747b8fd966-4n8b2   1/1     Running   0          47s
+    build-webhook-6dc78d8f6d-gsm4k      1/1     Running   0          47s
+    ```
 
 ### Install Kaniko Build Template
 
@@ -69,9 +70,9 @@ As a part of this lab, we will use the kaniko build template for building source
 
 1. Install the kaniko build template to your cluster.
 
-  ```
-  kubectl apply --filename https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
-  ```
+      ```
+      kubectl apply --filename https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
+      ```
 
 2. Use kubectl to confirm you installed the kaniko build template, as well as to see some more details about it.  You'll see that this build template accepts parameters of `IMAGE` and `DOCKERFILE`.  `IMAGE` is the name of the image you will push to the container registry, and `DOCKERFILE` is the path to the Dockerfile that will be built.
 
@@ -82,18 +83,18 @@ As a part of this lab, we will use the kaniko build template for building source
 
 	Example Output:
 	```yaml
-  spec:
-    generation: 1
-    parameters:
-    - description: The name of the image to push
-      name: IMAGE
-    - default: /workspace/Dockerfile
-      description: Path to the Dockerfile to build.
-      name: DOCKERFILE
-    steps:
-    - args:
-      - --dockerfile=${DOCKERFILE}
-      - --destination=${IMAGE}
-      image: gcr.io/kaniko-project/executor
-      name: build-and-push
+      spec:
+        generation: 1
+        parameters:
+        - description: The name of the image to push
+          name: IMAGE
+        - default: /workspace/Dockerfile
+          description: Path to the Dockerfile to build.
+          name: DOCKERFILE
+        steps:
+        - args:
+          - --dockerfile=${DOCKERFILE}
+          - --destination=${IMAGE}
+          image: gcr.io/kaniko-project/executor
+          name: build-and-push
 		```

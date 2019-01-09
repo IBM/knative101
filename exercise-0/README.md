@@ -5,7 +5,7 @@ If you already have `ibmcloud` installed with the `ibmcloud cs` plugin, you can 
 ### Installing the IBM Cloud developer tools
 
 1. Download and install the `ibmcloud` command line tool:
-    https://console.bluemix.net/docs/cli/index.html#overview
+    https://cloud.ibm.com/docs/cli/index.html#overview
 
 1. Install the `cs` (container-service) plugin:
 
@@ -19,7 +19,7 @@ If you already have `ibmcloud` installed with the `ibmcloud cs` plugin, you can 
     ```
 
 ### Create a standard cluster
-This lab requires a standard (paid) cluster. Create a new standard cluster from the [IBM Cloud UI](https://console.bluemix.net/containers-kubernetes/catalog/cluster/create).
+This lab requires a standard (paid) cluster. Create a new standard cluster from the [IBM Cloud UI](https://cloud.ibm.com/containers-kubernetes/catalog/cluster/create).
 
 1. To ensure the cluster is large enough to host all the Knative and Istio
 components, the recommended configuration for a cluster is:

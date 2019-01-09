@@ -97,4 +97,4 @@ As a part of this lab, we will use the kaniko build template for building source
           - --destination=${IMAGE}
           image: gcr.io/kaniko-project/executor
           name: build-and-push
-		```
+	```

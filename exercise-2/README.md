@@ -35,7 +35,7 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
       kubectl apply --filename docker-secret.yaml
       ```
 
-      View the yaml file used create the Secret:
+      View the yaml file used to create the Secret:
       ```
       kubectl get secret basic-user-pass -o yaml
       ```

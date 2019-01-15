@@ -1,0 +1,274 @@
+#!/bin/bash
+
+# Usage: demo [--clean] [ cluster-name ]
+# default 'cluster-name' is "knative101"
+
+set -e
+
+source $(dirname "$0")/.demoscript
+RETRYONFAIL=1
+
+base64=(base64 -w0)
+if [[ `uname` == *"Darwin"* ]]; then
+    base64=(base64 -b0)
+fi
+
+if [[ "$1" == "--clean" ]]; then
+    clean="true"
+    shift
+fi
+
+CLUSTER=${1:${CLUSTER}}
+CLUSTER=${CLUSTER:-${KUBECONFIG#*/clusters/}}
+CLUSTER=${CLUSTER%%/*.yml}
+NAME=${1:-${CLUSTER:-knative101}}
+CRNS=${CRNS:-fibdemo-${RANDOM}}
+ZONE=${ZONE:-dal13}
+MACHINE=${MACHINE:-b2c.4x16}
+WORKERS=${WORKERS:-3}
+
+comment --nolf "Cluster Name: ${NAME}"
+comment "Registry NS : ${CRNS}"
+
+if [[ -n "${clean}" ]]; then
+    set +e
+    echo Cleaning - but will not uninstall Knative, Istio or delete the cluster
+    rm -f out
+    $(bx ks cluster-config --export ${NAME})
+    
+    # exercise 3
+    echo Cleaning exercise 3
+    bx cr image-rm registry.ng.bluemix.net/${CRNS}/fib-knative
+    kubectl delete ksvc/fib-knative
+    
+    # exercise 2
+    echo Cleaning exercise 2
+    kubectl delete serviceaccount/build-bot >> out 2>&1
+    kubectl delete secret/basic-user-pass >> out 2>&1
+    kubectl delete secret/ibm-cr-secret >> out 2>&1
+
+    bx cr tokens | grep "for fibdemo" | while read a b ; do
+        yes | bx cr token-rm $a
+    done
+
+    bx cr namespace-list | grep fibdemo- | while read a ; do
+        yes | bx cr namespace-rm $a
+    done
+    
+    rm -rf fib-knative >> out 2>&1
+
+    # exercise 1
+    echo Cleaning exercise 1
+    kubectl delete -f https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml >> out 2>&1
+
+    # kubectl delete -f https://github.com/knative/serving/releases/download/v0.2.2/release.yaml >> out 2>&1
+    # kubectl delete -f knative.yaml >> out 2>&1
+    # kubectl label namespace default istio-injection- >> out 2>&1
+    # kubectl delete -f https://github.com/knative/serving/releases/download/v0.2.2/istio.yaml >> out 2>&1
+    # kubectl delete -f https://github.com/knative/serving/releases/download/v0.2.2/istio-crds.yaml >> out 2>&1
+    
+    # while kubectl get namespaces | grep Terminating >> out 2>&1 ; do
+        # sleep 5
+    # done
+
+    rm -f cmds out file
+    
+    exit 0
+fi
+
+comment --nolf Use the spacebar to step through things...
+comment --nolf Use 'f' to speed up the typing
+comment Use 'r' to stop pausing
+
+comment "Checking to see if the cluster (${NAME}) already exists..."
+if bx ks clusters | grep "^${NAME} .* normal "; then
+    comment "Cluster already exists"
+else
+    comment "Gathering vlan info..."
+    skip=1 doit bx ks vlans --zone $ZONE
+    PRI_VLAN=$(grep private out | sed "s/ .*//")
+    PUB_VLAN=$(grep public out | sed "s/ .*//")
+
+    # Create the cluster
+    doit echo bx ks cluster-create --name ${NAME} --zone ${ZONE} \
+        --machine-type ${MACHINE} --workers ${WORKERS} \
+        --private-vlan ${PRI_VLAN} --public-vlan ${PUB_VLAN}
+
+    comment "Waiting for cluster to be created..."
+    while ! (bx ks clusters | tee tmpout | grep "^${NAME} " | grep " normal ")
+    do
+        grep "^${NAME} " tmpout || true
+        sleep 30
+    done
+    rm tmpout
+    echo
+    doit kubectl get nodes
+fi
+
+comment "Get the config info..."
+doit bx ks cluster-config --export ${NAME}
+doit --fakeit $(cat out)
+$(cat out)
+
+### End of exercise 0
+
+comment Checking to see if Istio and Knative are installed
+kubectl get ns > out.sav
+
+if ! grep istio-system out.sav > /dev/null 2>&1 ; then
+    # comment Install Istio
+    # doit bx ks cluster-addon-enable istio --cluster ${NAME}
+
+    comment Install Istio CRDs
+    doit --noscroll kubectl apply -f \
+     https://github.com/knative/serving/releases/download/v0.2.2/istio-crds.yaml
+
+    comment Install Istio
+    doit --noscroll kubectl apply -f \
+        https://github.com/knative/serving/releases/download/v0.2.2/istio.yaml
+
+    comment "Enable Istio auto-sidecar injection for the 'default' namespace"
+    doit kubectl label namespace default istio-injection=enabled
+
+    comment "Wait until Istio is done installing..."
+    # Don't check that we're done too quickly, wait for the galley pod to appear
+    wait "kubectl get pods --namespace istio-system | grep istio-galley"
+
+    wait ! "kubectl get pods --namespace istio-system | grep -v NAME | \
+        grep -v Completed | grep -v Running"
+fi
+
+if ! grep knative-serving out.sav > /dev/null 2>&1 ; then
+    # comment Install Istio
+    # doit bx ks cluster-addon-enable istio --cluster ${NAME}
+
+    comment Install Knative
+    doit --noscroll kubectl apply -f \
+        https://github.com/knative/serving/releases/download/v0.2.2/release.yaml
+    doit --noscroll kubectl apply -f knative.yaml
+    bx ks cluster-addon-enable knative --cluster ${NAME}
+
+    comment Wait until Knative is ready...
+    wait ! "kubectl get pods --namespace knative-serving | \
+        grep -v Terminating | grep -v NAME | grep -v Running"
+fi
+
+rm -f out.sav
+
+comment Install the kaniko build template
+doit kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
+
+doit kubectl get BuildTemplate kaniko -o yaml
+
+###### End of exercise 1
+
+rm -rf fib-knative
+doit git clone https://github.com/beemarie/fib-knative.git
+doit --fakeit cd fib-knative
+cd fib-knative
+
+doit bx cr namespace-add ${CRNS}
+
+doit --noexec bx cr token-add --description \"for fibdemo\" --readwrite
+bx cr token-add --description "for fibdemo" --readwrite > out 2>&1
+cat out | sed "s/\(Token        *\).*/\1???/g"
+token=$(grep Token out | grep -v -i identi | sed "s/^[^ ]*\s*\([^ ]*\) *$/\1/g")
+token64=$(echo -n "${token}" | ${base64[*]})
+
+doit --noexec bx cr token-list
+bx cr token-list | grep -v true
+
+doit --noexec kubectl create secret docker-registry ibm-cr-secret \
+    --docker-server=https://registry.ng.bluemix.net \
+    --docker-username=token --docker-password=\"???\"
+kubectl create secret docker-registry ibm-cr-secret \
+    --docker-server=https://registry.ng.bluemix.net \
+    --docker-username=token --docker-password="${token}"
+
+sed -i "s/^\(.*password: *\).*$/\1${token64}/" docker-secret.yaml
+
+# scroll docker-secret.yaml
+doit grep -v password docker-secret.yaml
+doit kubectl apply -f docker-secret.yaml
+doit kubectl get secret basic-user-pass -o yaml \| grep -v password
+
+comment Now create our service account
+scroll service-account.yaml
+doit kubectl apply -f service-account.yaml
+doit kubectl get serviceaccount build-bot -o yaml
+
+# sed -i "s/build-bot/default/g" service.yaml
+# scroll service.yaml
+
+### End of exercise 2
+
+doit bx ks cluster-get ${NAME}
+comment Notice the "'Ingress Subdomain'" line
+ING=$(grep Subdomain out | sed "s/.*: *//" | sed "s/ *$//")
+doit "kubectl get cm config-domain --namespace knative-serving -o yaml > file"
+scroll file
+doit sed -i \"s/example.com/$ING/\" file
+scroll file
+doit kubectl apply -f file
+rm file
+
+sed -i "s/bmv.*/$ING/g" forward-ingress.yaml
+scroll forward-ingress.yaml
+doit kubectl apply -f forward-ingress.yaml
+
+sed -i "s/<NAMESPACE>/${CRNS}/g" service.yaml
+scroll service.yaml
+
+doit kubectl apply -f service.yaml
+
+comment Wait for service to build and start...
+kubectl get pods
+while true ; do
+    sleep 5
+    kubectl get pods | grep fib-knative 2>&1 | tee out
+    cat out | grep fib-knative.*deployment.*Running > /dev/null || continue
+    break
+done
+echo
+
+doit kubectl get pods
+
+doit bx cr image-list
+
+doit curl -sX POST http://fib-knative.default.$ING/fib -H 'Content-Type:application/json' -d \'{\"number\":20}\'
+echo
+
+### End of exercise 3
+
+if ! which kknctl > /dev/null 2>&1 ; then
+    doit wget --quiet https://github.com/cppforlife/knctl/releases/download/v0.1.0/knctl-linux-amd64 -O knctl
+    doit chmod +x knctl
+    PATH=.:$PATH
+fi
+
+doit knctl deploy \
+    --service fib-knative \
+    --git-url https://github.com/beemarie/fib-knative \
+    --git-revision vnext \
+    --service-account build-bot \
+    --image registry.ng.bluemix.net/${CRNS}/fib-knative:vnext \
+    --managed-route=false
+
+doit knctl revisions list
+
+doit curl -sX POST http://fib-knative.default.$ING/fib -H 'Content-Type:application/json' -d \'{\"number\":20}\'
+
+echo
+
+### End of exercise 4
+
+doit knctl route list
+
+doit knctl rollout --route fib-knative -p fib-knative:latest=50% \
+    -p fib-knative:previous=50%
+
+doit knctl route list
+
+doit --ignorerc timeout 30 bash -c \"while sleep 0.5\; do curl -sX POST \\\"http://fib-knative.default.knative102.us-south.containers.appdomain.cloud/fib\\\" -H Content-Type:application/json   -d \'{\\\"number\\\":1}\' \; done\"
+
+rm -f cmds out

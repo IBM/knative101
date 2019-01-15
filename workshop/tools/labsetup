@@ -1,0 +1,127 @@
+#!/bin/bash
+
+# Usage: labsetup REGISTRY_NS_NAME K8S_CLUSTER_NAME
+# Where "REGISTRY_NS_NAME" is the desired IBM Container Service Registry
+# namespace name, and "K8S_CLUSTER_NAME" is the name of your Kubernetes cluster.
+
+set -e
+
+# Make sure we clean-up afterwards
+trap clean EXIT
+function clean {
+    rm -f labsetup-tmp*
+	echo
+}
+
+if [[ -z "$1" ]]; then
+    echo "Missing required parameter 'REGISTRY_NS_NAME'"
+    exit 1
+fi
+
+if [[ -z "$2" ]]; then
+    echo "Missing required parameter 'K8S_CLUSTER_NAME'"
+    exit 1
+fi
+
+NS_NAME=${1}
+K8S_NAME=${2}
+TMPNAME=labsetup-tmp${RANDOM}
+ACCOUNT_SEARCH=${ACCOUNT_SEARCH:-" IBM  *ACTIVE"}
+
+# Look for required executables
+if ! which ic > /dev/null ; then
+    echo "'ic' command is not installed"
+    exit 1
+fi
+
+if ! ic cr > /dev/null 2>&1 ; then
+    echo "'cr' plugin is not installed"
+    exit 1
+fi
+
+if ! ic ks > /dev/null 2>&1 ; then
+    echo "'ks' plugin is not installed"
+    exit 1
+fi
+
+if ! which kubectl > /dev/null 2>&1 ; then
+    echo "'kubectl' is not installed"
+    exit 1
+fi
+
+# Mac and Linux have different flags for base64
+base64=(base64 -w0)
+if [[ `uname` == *"Darwin"* ]]; then
+    base64=(base64 -b0)
+fi
+
+echo Creating registry namespace: ${NS_NAME}
+ic cr namespace-add ${NS_NAME}
+
+echo Creating a registry access token
+ic cr token-add --description "for fibdemo" --readwrite > ${TMPNAME}-out
+token=$(grep Token ${TMPNAME}-out | grep -v -i identi | sed "s/^[^ ]*\s*\([^ ]*\) *$/\1/g")
+token64=$(echo -n "${token}" | ${base64[*]})
+rm -f ${TMPNAME}-out
+
+
+echo Switching to the IBM account to access the lab Kubernetes cluster
+account=$(ic account list | grep "${ACCOUNT_SEARCH}" | sed "s/ .*//")
+if [[ -z "${account}" ]]; then
+    echo "Can't find the '${ACCOUNT_SEARCH}' account"
+    exit 1
+fi
+ic target -c "${account}"
+
+
+echo Retrieving the configuration for Kubernetes cluster: ${K8S_NAME}
+bx ks cluster-config --export "${K8S_NAME}" > ${TMPNAME}-config || \
+    (cat ${TMPNAME}-config && echo Error getting config && exit 1)
+config=$(cat "${TMPNAME}-config")
+$(echo ${config})
+rm -f "${TMPNAME}-config"
+
+
+echo Creating the docker registry secret
+kubectl create secret docker-registry ibm-cr-secret \
+    --docker-server=https://registry.ng.bluemix.net \
+    --docker-username=token --docker-password="${token}"
+
+# Create the basic auth Secret
+cat > ${TMPNAME}-secret <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: basic-user-pass
+  annotations:
+    build.knative.dev/docker-0: registry.ng.bluemix.net
+type: kubernetes.io/basic-auth
+data:
+  username: dG9rZW4=
+  password: ${token64}
+EOF
+
+echo Creating the basic user auth secret
+kubectl apply -f ${TMPNAME}-secret
+rm -f ${TMPNAME}-secret
+
+# Create the ServiceAccount
+cat > ${TMPNAME}-sa <<EOF
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: build-bot
+secrets:
+- name: basic-user-pass
+imagePullSecrets:
+- name: ibm-cr-secret
+EOF
+
+echo Creating the ServiceAccount
+kubectl apply -f ${TMPNAME}-sa
+rm -f ${TMPNAME}-sa
+
+echo
+echo Export environment variables to start using Kubernetes:
+echo 
+echo ${config}

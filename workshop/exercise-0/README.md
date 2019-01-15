@@ -57,3 +57,6 @@ Set the context for your cluster in your CLI. Every time you log in to the CLI t
     ```shell
     kubectl get node
     ```
+
+
+Continue on to [exercise 1](../exercise-1/README.md).

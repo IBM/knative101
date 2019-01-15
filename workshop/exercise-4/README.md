@@ -53,3 +53,6 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
   ```
   curl -X POST http://fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -H 'Content-Type: application/json' -d '{"number":3}'
   ```
+
+
+Continue on to [exercise 5](../exercise-5/README.md).

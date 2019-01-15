@@ -9,7 +9,7 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
     ```
     knctl deploy \
         --service fib-knative \
-        --git-url https://github.com/beemarie/fib-knative \
+        --git-url https://github.com/IBM/fib-knative \
         --git-revision vnext \
         --service-account build-bot \
         --image registry.ng.bluemix.net/<NAMESPACE>/fib-knative:vnext \

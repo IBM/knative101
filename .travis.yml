@@ -1,0 +1,11 @@
+language: script
+
+script:
+- bash -n $(find . -name *.sh)
+- ./.verify-links.sh -v
+
+deploy:
+  - provider: script
+    skip_cleanup: true
+    on:
+      all_branches: true

@@ -4,7 +4,7 @@ Let's get our first Knative application up & running. Using the Build & Serving 
 
 
 ### Update domain configuration for Knative
-When a Knative application is deployed, Knative will define a URL for your application. By default, this url is "default.example.com." Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own hostname.
+When a Knative application is deployed, Knative will define a URL for your application. By default, this url is "example.com." Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own hostname.
 
 What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an external domain when we created our cluster. We'll first get that URL, tell Knative to assign new applications to that URL, and then forward requests to our Ingress Subdomain to the Knative Istio Gateway.
 
@@ -26,13 +26,13 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 	kubectl edit cm config-domain --namespace knative-serving
 	```
 
-3. Change instances of `default.example.com` to your ingress subdomain, which should look like: `bmv-knative.us-east.containers.appdomain.cloud`. New Knative applications will now be assigned a route with this host, rather than `default.example.com`.
+3. Change instances of `example.com` to your ingress subdomain, which should look like: `bmv-knative.us-east.containers.appdomain.cloud`. New Knative applications will now be assigned a route with this host, rather than `example.com`.
 
 ### Forward specific requests coming into IKS ingress to the Knative Ingress Gateway
 
 1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Update the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`, or whatever subdomain you would like your application to live at. The file should look something like:
 
-	```yaml
+```yaml
   apiVersion: extensions/v1beta1
   kind: Ingress
   metadata:
@@ -47,7 +47,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
                 backend:
                   serviceName: knative-ingressgateway
                   servicePort: 80
-	```
+```
 
 2. Apply the ingress rule.
 

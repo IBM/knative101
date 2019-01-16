@@ -98,3 +98,6 @@ As a part of this lab, we will use the kaniko build template for building source
           image: gcr.io/kaniko-project/executor
           name: build-and-push
 	```
+
+
+Continue on to [exercise 2](../exercise-2/README.md).

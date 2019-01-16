@@ -9,6 +9,8 @@ Additinally, there's a [presentation](./presentation) directory with a
 set of presentations that complement the workshop material and can be used for
 meetups. 
 
+To get started with the workshop go [here](./workshop/README.md).
+
 ## License
 
 [License](./LICENSE.txt)

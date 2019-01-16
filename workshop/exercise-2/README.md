@@ -81,3 +81,6 @@ A `Service Account` provides an identity for processes that run in a Pod. This S
 
 
 Congratulations! You've set up some required credentials for the Knative build process to have access to push to your container registry. In the next exercise, you will build & deploy this app. The goal of this exercise was to set up the credentials for your app.
+
+
+Continue on to [exercise 3](../exercise-3/README.md).

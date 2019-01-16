@@ -17,3 +17,6 @@ You'll learn to deploy applications using kubectl with a configuration yaml file
 You'll also learn to work with revisions and routes, sending some percentage of your traffic to a new revision.
 
 ![diagram of the app created in this lab](README_images/knativeappdiagram.png)
+
+
+Get started with the [workshop](./exercise-0/README.md).

@@ -88,9 +88,9 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 	Expected Output:
 	```
 	NAME                                            READY   STATUS      RESTARTS   AGE
-	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
-	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0     89s
-	fib-knative-00001-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0     91s
+	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3   	Running   	0     	   56s
+	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0     	   89s
+	fib-knative-00001-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0     	   91s
 	```
 
 Continue on to [exercise 4](../exercise-4/README.md).

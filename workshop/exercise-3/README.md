@@ -83,7 +83,14 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 
 7. Find `scale-to-zero-threshold`, and decrease the time from 5m to 1m. You can also decrease the `scale-to-zero-grace-period` to 30s.
 
-8. Run `kubectl get pods --watch` and wait to see the application scale itself back down to 0 in the next 1.5 minutes.
+8. Run `kubectl get pods --watch` and wait to see the application scale itself back down to 0 in the next 1.5 minutes. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state.
 
+	Expected Output:
+	```
+	NAME                                            READY   STATUS      RESTARTS   AGE
+	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
+	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
+	fib-knative-00001-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
+	```
 
 Continue on to [exercise 4](../exercise-4/README.md).

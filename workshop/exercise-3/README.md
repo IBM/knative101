@@ -4,7 +4,9 @@ Let's get our first Knative application up & running. Using the Build & Serving 
 
 
 ### Update domain configuration for Knative
-When a Knative application is deployed, Knative will define a URL for your application. By default, this url is "example.com." Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own hostname.
+When a Knative application is deployed, Knative will define a URL for your application. By default, Knative Serving routes use `example.com` as the default domain. The fully qualified domain name for a route by default is `{route}.{namespace}.{default-domain}`, where `{route}` is the name of the application to deploy.
+
+Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own domain.
 
 What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an external domain when we created our cluster. We'll first get that URL, tell Knative to assign new applications to that URL, and then forward requests to our Ingress Subdomain to the Knative Istio Gateway.
 
@@ -30,7 +32,9 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 
 ### Forward specific requests coming into IKS ingress to the Knative Ingress Gateway
 
-1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Update the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`, or whatever subdomain you would like your application to live at. The file should look something like:
+1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Update the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`. Remember that the fully qualified domain name for a route has the following form: `{route}.{namespace}.{domain}`.
+
+The file should look something like:
 
 ```yaml
   apiVersion: extensions/v1beta1

@@ -1,16 +1,16 @@
 ## Create IBM Cloud Account and Get Cluster
 
-If you already have `ibmcloud` installed with the `ibmcloud cs` plugin, you can skip these steps.
+If you already have `ibmcloud` installed with the `ibmcloud ks` plugin, you can skip these steps.
 
 ### Installing the IBM Cloud developer tools
 
 1. Download and install the `ibmcloud` command line tool:
     https://cloud.ibm.com/docs/cli/index.html#overview
 
-1. Install the `cs` (container-service) plugin:
+1. Install the `ks` (kubernetes-service) plugin:
 
     ```
-    ibmcloud plugin install container-service -r Bluemix
+    ibmcloud plugin install kubernetes-service
     ```
 1. Authorize `ibmcloud`:
 
@@ -33,7 +33,7 @@ components, the recommended configuration for a cluster is:
 4. Wait while your cluster is fully deployed. Repeat this command until the state of the cluster is `normal`.
 
     ```
-    ibmcloud cs clusters | grep $CLUSTER_NAME
+    ibmcloud ks clusters | grep $CLUSTER_NAME
     ```
 
 ### Set context for kubectl
@@ -42,7 +42,7 @@ Set the context for your cluster in your CLI. Every time you log in to the CLI t
 1. Download the configuration file and certificates for your cluster using the `cluster-config` command.
 
     ```shell
-    ibmcloud cs cluster-config <your_cluster_name>
+    ibmcloud ks cluster-config <your_cluster_name>
     ```
 
 2. Copy and paste the output command from the previous step to set the `KUBECONFIG` environment variable and configure your CLI to run `kubectl` commands against your cluster.

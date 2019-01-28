@@ -17,7 +17,7 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
   ```
 
 ### Deploy vnext
-1. Let's deploy vnext, but instead of kubectl with the service.yaml file, let's use knctl. By providing Knative with the source of our app and the image to push to dockerhub, we'll get an application with a URL we can access.
+1. Let's deploy vnext, but instead of kubectl with the service.yaml file, let's use knctl. By providing Knative with the source of our app and the image to push to the container registry, we'll get an application with a URL we can access.
 
 	```
 	knctl deploy \
@@ -25,10 +25,11 @@ knctl is a new Knative CLI providing a simple set of commands to interact with a
 	    --git-url https://github.com/beemarie/fib-knative \
 	    --git-revision vnext \
 	    --service-account build-bot \
-	    --image index.docker.io/beemarie/fib-knative:vnext \
+	    --image registry.ng.bluemix.net/bmv-ibm/fib-knative:vnext \
 	    --managed-route=false
 	```
-	This command will tell Knative to go out to github, find my code, build it into a container, and push that container to dockerhub. One thing you'll notice if you follow the output logs is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
+
+	This command will tell Knative to go out to github, find my code, build it into a container, and push that container to the IBM Container Registry. One thing you'll notice if you follow the output logs is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
 
 2. See the revisions using knctl.
 

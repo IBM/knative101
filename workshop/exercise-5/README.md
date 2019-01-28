@@ -20,7 +20,7 @@ Maybe we want to slowly roll users over from our old version to the new version,
   Succeeded
   ```
 
-2. Send 50% of the traffic to the latest revision, and 50% to the previous revision:
+2. Send 50% of the traffic to the latest revision, and 50% to the previous revision. Notice that we're using the previous and latest tags that were created for us as a part of the knctl deploy command.
 
 	```
 	knctl rollout --route fib-knative -p fib-knative:latest=50% -p fib-knative:previous=50%

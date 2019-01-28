@@ -1,6 +1,6 @@
 ## Deploy Our first Knative application
 
-Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a docker image built on cluster (using the Kaniko build template), to a docker image pushed to dockerhub, and ultimately a URL to access our application.
+Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a container image built on cluster (using the Kaniko build template), to a container image pushed to a private container registry on IBM Cloud, and ultimately a URL to access our application.
 
 
 ### Update domain configuration for Knative
@@ -70,7 +70,16 @@ The file should look something like:
 	```
 3. Run `kubectl get pods --watch` to see the pods initializing.
 
-4. Once all the pods are initialized, go to dockerhub to see that your container image was built and pushed to dockerhub.
+4. Once all the pods are initialized, you can see that your container image was built and pushed to the IBM Container Registry:
+
+	```
+	ibmcloud cr image-list
+	```
+	Expected output:
+	
+	```
+	registry.ng.bluemix.net/bmv-ibm/fib-knative   latest     bd42179ab4a7     bmv-ibm	1 minute ago	26 MB	No Issues
+	```
 
 5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us:
 

@@ -55,7 +55,7 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 	```
 	echo -n "token" | base64
 
-	echo -n "token_value" | base64
+	echo -n "<token_value>" | base64 -w0
 	```
 
 2. This time we'll create the secret via a .yaml file. Update the `docker-secret.yaml` file with your base64 encoded username and password.
@@ -75,17 +75,17 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 
       ```yaml
       apiVersion: v1
-        kind: Secret
-        metadata:
-          name: basic-user-pass
-          annotations:
-            build.knative.dev/docker-0: registry.ng.bluemix.net
-        type: kubernetes.io/basic-auth
-        data:
-          # Use 'echo -n "username" | base64' to generate this string
-          username: your_base_64_username
-          # Use 'echo -n "password" | base64' to generate this string
-          password: your_base_64_password
+      kind: Secret
+      metadata:
+        name: basic-user-pass
+        annotations:
+          build.knative.dev/docker-0: registry.ng.bluemix.net
+      type: kubernetes.io/basic-auth
+      data:
+        # Use 'echo -n "username" | base64' to generate this string
+        username: your_base_64_username
+        # Use 'echo -n "password" | base64' to generate this string
+        password: your_base_64_password
       ```
 
 A `Service Account` provides an identity for processes that run in a Pod. This Service Account will be used to link the build process for Knative to the Secrets you just created.
@@ -103,7 +103,7 @@ A `Service Account` provides an identity for processes that run in a Pod. This S
 
     Example output:
     ```yaml
-       apiVersion: v1
+     apiVersion: v1
      kind: ServiceAccount
      metadata:
        name: build-bot

@@ -14,7 +14,7 @@ The application for this lab is a simple node.js with express app which returns 
 	cd fib-knative
 	```
 
-## Set up a Private Container Registry and Obtain Credentials
+### Set up a Private Container Registry and Obtain Credentials
 In this lab, we'll use the [IBM Container Registry](https://console.bluemix.net/docs/services/Registry/registry_overview.html#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
 
 1. Install the container registry plugin:

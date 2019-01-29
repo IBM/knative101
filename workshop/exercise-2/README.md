@@ -50,12 +50,11 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
   kubectl create secret docker-registry ibm-cr-secret --docker-server=https://registry.ng.bluemix.net --docker-username=token --docker-password=<token_value>
   ```
 
-2. We will also need a secret for the kaniko build template to be able to push the built image to the container registry. To create this object, we'll first need to base64 encode our username and password for IBM Container Registry. For username, you will again use the string `token`. The base64 encoding of `token` should be: `dG9rZW4=`.  For token_value, again use the token you made note of earlier.
+2. We will also need a secret for the kaniko build template to be able to push the built image to the container registry. To create this object, we'll first need to base64 encode our username and password for IBM Container Registry. For username, you will again use the string `token`. The base64 encoding of `token` should be: `dG9rZW4=` - which is already in the yaml file.  For token_value, again use the token you made note of earlier.
 
 	```
-	echo -n "token" | base64
-
-	echo -n "<token_value>" | base64 -w0
+	echo -n "<token_value>" | base64 -w0  # Linux
+	echo -n "<token_value>" | base64 -b0  # MacOS
 	```
 
 2. This time we'll create the secret via a .yaml file. Update the `docker-secret.yaml` file with your base64 encoded username and password.

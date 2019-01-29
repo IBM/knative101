@@ -27,7 +27,7 @@ In this lab, we'll use the [IBM Container Registry](https://console.bluemix.net/
   ```
   ibmcloud cr namespace-add <my_namespace>
   ```
-3. Create a token. This token is a non-expiring token with read and write access to all namespaces in the region. The automated build processes you'll be setting will use this token to access your images.
+3. Create a token. This token is a non-expiring token with read and write access to all namespaces in the region. The automated build processes you'll be setting up will use this token to access your images.
 
   ```
   ibmcloud cr token-add --description "read write token for all namespaces" --non-expiring --readwrite

@@ -28,7 +28,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 	kubectl edit cm config-domain --namespace knative-serving
 	```
 
-3. Change instances of `example.com` to your ingress subdomain, which should look like: `bmv-knative.us-east.containers.appdomain.cloud`. New Knative applications will now be assigned a route with this host, rather than `example.com`.
+3. Change all instances of `example.com` to your ingress subdomain, which should look something like: `bmv-knative.us-east.containers.appdomain.cloud`. There should be two instances of `example.com`, one under `data` and one under `annotations`. New Knative applications will now be assigned a route with this host, rather than `example.com`.
 
 ### Forward specific requests coming into IKS ingress to the Knative Ingress Gateway
 
@@ -44,7 +44,7 @@ The file should look something like:
     namespace: istio-system
     spec:
       rules:
-        - host: fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud
+        - host: fib-knative.default.<ingress_subdomain>
           http:
             paths:
               - path: /
@@ -61,7 +61,7 @@ The file should look something like:
 
 ### Deploy the Fibonacci App Using kubectl and service.yaml
 
-1. Edit the `service.yaml` file to point to your own container registry.
+1. Edit the `service.yaml` file to point to your own container registry namespace by replacing instances of <NAMESPACE> with the container registry namespace you created earlier.
 
 2. Apply the `service.yaml` file to your cluster.
 
@@ -84,19 +84,11 @@ The file should look something like:
 5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us:
 
 	```
-	curl -X POST http://fib-knative.default.<your-ingress-subdomain>/fib -H 'Content-Type: application/json' -d '{"number":20}'
+	curl -X POST http://fib-knative.default.<ingress_subdomain>/fib -H 'Content-Type: application/json' -d '{"number":20}'
 	```
 6. You should see the first 20 Fibonacci numbers!
 
-7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. The default for Knative scale-to-zero is 5 minutes. Let's decrease this time by editing the autoscaler:
-
-	```
-	kubectl edit cm config-autoscaler --namespace knative-serving
-	```
-
-7. Find `scale-to-zero-threshold`, and decrease the time from 5m to 1m. You can also decrease the `scale-to-zero-grace-period` to 30s.
-
-8. Run `kubectl get pods --watch` and wait to see the application scale itself back down to 0 in the next 1.5 minutes. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state.
+7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state.
 
 	Expected Output:
 	```

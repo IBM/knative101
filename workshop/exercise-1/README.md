@@ -7,13 +7,13 @@ Knative is currently built on top of both Kubernetes and Istio. You will need to
 1. A Custom Resource Definition enables you to create custom resources, extensions to the Kubernetes API on your Kubernetes cluster. Istio needs these CRDs to be created before we can install.  Install Istio’s CRDs via kubectl apply, and wait a few seconds for the CRDs to be committed in the kube-apiserver.
 
 	```
-	kubectl apply -f https://github.com/knative/serving/releases/download/v0.2.2/istio-crds.yaml
+	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/istio-crds.yaml
 	```
 
 2. Install Istio:
 
 	```
-	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.2.2/istio.yaml
+	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/istio.yaml
 	```
 3. Label the default namespace with `istio-injection=enabled`:
 
@@ -30,13 +30,17 @@ Knative is currently built on top of both Kubernetes and Istio. You will need to
 
 ### Install Knative
 
-After installing Istio, you can install Knative. For this lab, we will install both the Build & Serving components of Knative.
+After installing Istio, you can install Knative. For this lab, we will install all available Knative components.
 
 1. Install Knative:
 
-	```
-	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.2.2/release.yaml
-	```
+    ```
+    kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/serving.yaml \
+    --filename https://github.com/knative/build/releases/download/v0.3.0/release.yaml \
+    --filename https://github.com/knative/eventing/releases/download/v0.3.0/release.yaml \
+    --filename https://github.com/knative/eventing-sources/releases/download/v0.3.0/release.yaml \
+    --filename https://github.com/knative/serving/releases/download/v0.3.0/monitoring.yaml
+    ```
 
 2. Monitor the Knative components until all of the components show a `STATUS` of `Running` or `Completed`:
 
@@ -44,6 +48,9 @@ After installing Istio, you can install Knative. For this lab, we will install b
     ```
     kubectl get pods --namespace knative-serving
     kubectl get pods --namespace knative-build
+    kubectl get pods --namespace knative-eventing
+    kubectl get pods --namespace knative-sources
+    kubectl get pods --namespace knative-monitoring
     ```
     Example Ouput:
 
@@ -70,9 +77,9 @@ As a part of this lab, we will use the kaniko build template for building source
 
 1. Install the kaniko build template to your cluster.
 
-      ```
-      kubectl apply --filename https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
-      ```
+    ```
+    kubectl apply --filename https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
+    ```
 
 2. Use kubectl to confirm you installed the kaniko build template, as well as to see some more details about it.  You'll see that this build template accepts parameters of `IMAGE` and `DOCKERFILE`.  `IMAGE` is the name of the image you will push to the container registry, and `DOCKERFILE` is the path to the Dockerfile that will be built.
 

@@ -1,57 +1,47 @@
-## A/B Testing with knctl
+## Deploy vnext Version Using knctl
 
-Maybe we want to slowly roll users over from our old version to the new version, or do some A/B testing of the new version. We can use the knctl rollout command to route traffic percentages to our revisions.
+Did you notice that the Fibonacci sequence started with 1? Most would argue that the sequence should actually start with 0. There's a vnext version of the application at the vnext branch in the github project. We'll deploy that as v2 of our app, but instead of using kubectl, let's try the knctl tool you installed earlier.
 
-1. Check the current route percentages:
 
-	```
-	knctl route list
-	```
+### Deploy vnext
+1. Let's deploy vnext, but instead of kubectl with the service.yaml file, let's use knctl. By providing Knative with the source of our app and the image to push to the container registry, we'll get an application with a URL we can access.
 
-	Output:
-	```
-	Routes in namespace 'default'
+    ```
+    knctl deploy \
+        --service fib-knative \
+        --git-url https://github.com/beemarie/fib-knative \
+        --git-revision vnext \
+        --service-account build-bot \
+        --image registry.ng.bluemix.net/<NAMESPACE>/fib-knative:vnext \
+        --managed-route=false
+    ```
 
-	Name         Domain                                                              Traffic                   Annotations  Conditions  Age  
-	fib-knative  fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  100% -> fib-knative  -            3 OK / 3    20h  
+	This command will tell Knative to go out to github, find the code, build it into a container, and push that container to the IBM Container Registry. One thing you'll notice if you follow the output logs is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
 
-	1 routes
-
-	Succeeded
-	```
-
-2. Send 50% of the traffic to the latest revision, and 50% to the previous revision. Notice that we're using the previous and latest tags that were created for us as a part of the knctl deploy command.
+2. See the revisions using knctl.
 
 	```
-	knctl rollout --route fib-knative -p fib-knative:latest=50% -p fib-knative:previous=50%
+	knctl revisions list
 	```
-
-3. Check the route percentages to confirm they've updated:
-
+	Expected output:
+	
 	```
-	knctl route list
-	```
+    Revisions
 
-	Output:
-	```
-		Routes in namespace 'default'
+    Service      Name               Tags      Annotations  Conditions  Age  Traffic  
+    fib-knative  fib-knative-00002  latest    -            5 OK / 5    20h  100% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
+    ~            fib-knative-00001  previous  -            5 OK / 5    20h  -
 
-		Name         Domain                                                                       Traffic                   Annotations  Conditions  Age  
-		fib-knative  fib-knative.default.bmv-knative-101-test.us-east.containers.appdomain.cloud  50% -> fib-knative-00002  -            3 OK / 3    9m  
-																								50% -> fib-knative-00001                             
+    2 revisions
 
-		1 routes
+    Succeeded
+    ```
 
-		Succeeded
-	```
+3. Curl the application to see that 100% of the traffic is hitting your new fib-knative revision, starting the sequence with 0. Ensure you've updated the command with your own ingress subdomain.
 
-3. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called.
-
-	```
-	while sleep 0.5; do curl -X POST "http://fib-knative.default.<ingress_subdomain>/fib" -H 'Content-Type: application/json'   -d '{"number":1}' ; done
-	```
-
-4. We should see that the curl requests are routed approximately 50/50 between the two applications. Let's kill this process using ctrl-c.
+    ```
+    curl -X POST http://fib-knative.default.<ingress_subdomain>/fib -H 'Content-Type: application/json' -d '{"number":3}'
+    ```
 
 
-At this point, you should feel that you've had a whirlwind tour of Knative. We installed Istio & Knative onto a Kubernetes cluster. We deployed a serverless application and saw it scale up and then back down when it was no longer in use. We also explored the knctl tool to easily create routing rules and deploy serverless applications. Please reach out should you have any questions or issues going through this lab!
+Continue on to [exercise 6](../exercise-6/README.md).

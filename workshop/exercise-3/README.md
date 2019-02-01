@@ -1,101 +1,70 @@
-## Deploy Our first Knative application
+## Install Istio and Knative on Your Cluster
 
-Let's get our first Knative application up & running. Using the Build & Serving components of Knative, we can go from some source code on github to a container image built on cluster (using the Kaniko build template), to a container image pushed to a private container registry on IBM Cloud, and ultimately a URL to access our application.
+Knative is currently built on top of both Kubernetes and Istio. You will need to install Istio to install Knative. If you want to learn more, you can check out the labs [Kube101](https://github.com/IBM/kube101/tree/master/workshop) and [Istio101](https://github.com/IBM/istio101/tree/master/workshop).
 
+### Install Istio
 
-### Update domain configuration for Knative
-When a Knative application is deployed, Knative will define a URL for your application. By default, Knative Serving routes use `example.com` as the default domain. The fully qualified domain name for a route by default is `{route}.{namespace}.{default-domain}`, where `{route}` is the name of the application to deploy.
-
-Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own domain.
-
-What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an external domain when we created our cluster. We'll first get that URL, tell Knative to assign new applications to that URL, and then forward requests to our Ingress Subdomain to the Knative Istio Gateway.
-
-1. First, let's get the ingress subdomain for our cluster.
+1. A Custom Resource Definition enables you to create custom resources, extensions to the Kubernetes API on your Kubernetes cluster. Istio needs these CRDs to be created before we can install.  Install Istio’s CRDs via kubectl apply, and wait a few seconds for the CRDs to be committed in the kube-apiserver.
 
 	```
-	ibmcloud ks cluster-get <my-cluster-name>
+	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/istio-crds.yaml
 	```
 
-	Example Output:
-	```
-	Ingress Subdomain:      bmv-knative.us-east.containers.appdomain.cloud   
-	```
-	Ingress is a Kubernetes service that balances network traffic workloads in your cluster by forwarding public or private requests to your apps. This Ingress Subdomain is an externally available and public URL providing access to your cluster. Take note of this Ingress Subdomain.
-
-2. Next, update the default URL for new Knative apps by editing the configuration:
+2. Install Istio:
 
 	```
-	kubectl edit cm config-domain --namespace knative-serving
+	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/istio.yaml
 	```
-
-3. Change all instances of `example.com` to your ingress subdomain, which should look something like: `bmv-knative.us-east.containers.appdomain.cloud`. There should be two instances of `example.com`, one under `data` and one under `annotations`. New Knative applications will now be assigned a route with this host, rather than `example.com`.
-
-### Forward specific requests coming into IKS ingress to the Knative Ingress Gateway
-
-1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Update the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`. Remember that the fully qualified domain name for a route has the following form: `{route}.{namespace}.{domain}`.
-
-The file should look something like:
-
-```yaml
-  apiVersion: extensions/v1beta1
-  kind: Ingress
-  metadata:
-    name: iks-knative-ingress
-    namespace: istio-system
-    spec:
-      rules:
-        - host: fib-knative.default.<ingress_subdomain>
-          http:
-            paths:
-              - path: /
-                backend:
-                  serviceName: knative-ingressgateway
-                  servicePort: 80
-```
-
-2. Apply the ingress rule.
+3. Label the default namespace with `istio-injection=enabled`:
 
 	```
-	kubectl apply --filename forward-ingress.yaml
+	kubectl label namespace default istio-injection=enabled
 	```
 
-### Deploy the Fibonacci App Using kubectl and service.yaml
+4. Monitor the Istio components until all of the components show a `STATUS` of
+    `Running` or `Completed`:
 
-1. Edit the `service.yaml` file to point to your own container registry namespace by replacing instances of <NAMESPACE> with the container registry namespace you created earlier.
+    ```
+    kubectl get pods --namespace istio-system --watch
+    ```
 
-2. Apply the `service.yaml` file to your cluster.
+### Install Knative
 
-	```
-	kubectl apply -f service.yaml
-	```
-3. Run `kubectl get pods --watch` to see the pods initializing.
+After installing Istio, you can install Knative. For this lab, we will install all available Knative components.
 
-4. Once all the pods are initialized, you can see that your container image was built and pushed to the IBM Container Registry:
+1. Install Knative Serving & Build components:
 
-	```
-	ibmcloud cr image-list
-	```
-	Expected output:
-	
-	```
-	registry.ng.bluemix.net/bmv-ibm/fib-knative   latest     bd42179ab4a7     bmv-ibm	1 minute ago	26 MB	No Issues
-	```
+    ```
+    kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/serving.yaml \
+    --filename https://github.com/knative/build/releases/download/v0.3.0/release.yaml
+    ```
 
-5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us:
+2. Monitor the Knative components until all of the components show a `STATUS` of `Running` or `Completed`:
 
-	```
-	curl -X POST http://fib-knative.default.<ingress_subdomain>/fib -H 'Content-Type: application/json' -d '{"number":20}'
-	```
-6. You should see the first 20 Fibonacci numbers!
+	Commands:
+    ```
+    kubectl get pods --namespace knative-serving
+    kubectl get pods --namespace knative-build
+    ```
+    Example Ouput:
 
-7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state.
+    ```
+    NAME                          READY   STATUS    RESTARTS   AGE
+    activator-df78cb6f9-jpvs7     2/2     Running   0          38s
+    activator-df78cb6f9-nhzhf     2/2     Running   0          37s
+    activator-df78cb6f9-qjg8w     2/2     Running   0          37s
+    autoscaler-6fccb66768-m4f2q   2/2     Running   0          37s
+    controller-56cf5965f5-8pwcg   1/1     Running   0          35s
+    webhook-5dcbf967cd-lxzmk      1/1     Running   0          35s
+    ```
 
-	Expected Output:
-	```
-	NAME                                            READY   STATUS      RESTARTS   AGE
-	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
-	fib-knative-00001-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
-	fib-knative-00001-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
-	```
+    ```
+    NAME                                READY   STATUS    RESTARTS   AGE
+    build-controller-747b8fd966-4n8b2   1/1     Running   0          47s
+    build-webhook-6dc78d8f6d-gsm4k      1/1     Running   0          47s
+    ```
+
 
 Continue on to [exercise 4](../exercise-4/README.md).
+
+In the next exercise, you will build and deploy this app using Knative, which you just installed.

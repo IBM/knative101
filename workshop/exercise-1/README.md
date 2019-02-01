@@ -1,110 +1,46 @@
-## Install Istio, Knative, and Kaniko Build Template
+## Create a Cluster on IBM Cloud
+If you have already created a cluster on IBM Cloud, and have set the context for kubectl you can skip these steps.
 
-Knative is currently built on top of both Kubernetes and Istio. You will need to install Istio to install Knative. It's not required for this lab, but you can learn more about Istio by completing the [Istio 101 lab](https://github.com/IBM/istio101/tree/master/workshop).
+### Create a standard cluster
+This lab requires a standard (paid) cluster. Create a new standard cluster from the [IBM Cloud UI](https://cloud.ibm.com/containers-kubernetes/catalog/cluster/create).
 
-### Install Istio
+1. To ensure the cluster is large enough to host all the Knative and Istio
+components, the recommended configuration for a cluster is:
+  - Kubernetes version 1.11 or later
+  - 4 vCPU nodes with 16GB memory (`b2c.4x16`)
 
-1. A Custom Resource Definition enables you to create custom resources, extensions to the Kubernetes API on your Kubernetes cluster. Istio needs these CRDs to be created before we can install.  Install Istio’s CRDs via kubectl apply, and wait a few seconds for the CRDs to be committed in the kube-apiserver.
+2. It is required to select the worker zone, as well as to create a unique cluster name for your cluster. Ensure you've selected Kubernetes version 1.11.x, which may not be the default.
 
-	```
-	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/istio-crds.yaml
-	```
+3. Click `Create Cluster`.
 
-2. Install Istio:
-
-	```
-	kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/istio.yaml
-	```
-3. Label the default namespace with `istio-injection=enabled`:
-
-	```
-	kubectl label namespace default istio-injection=enabled
-	```
-
-4. Monitor the Istio components until all of the components show a `STATUS` of
-    `Running` or `Completed`:
+4. Wait while your cluster is fully deployed. Repeat this command until the state of the cluster is `normal`.
 
     ```
-    kubectl get pods --namespace istio-system --watch
+    ibmcloud ks clusters | grep <your_cluster_name>
     ```
 
-### Install Knative
+### Set context for kubectl
+Set the context for your cluster in your CLI. Every time you log in to the CLI to work with the cluster, you must run this command to set a path to the cluster's configuration file as a session variable. The Kubernetes CLI uses this variable to find a local configuration file and certificates that are necessary to connect with the cluster in IBM Cloud.
 
-After installing Istio, you can install Knative. For this lab, we will install all available Knative components.
+1. Download the configuration file and certificates for your cluster using the `cluster-config` command.
 
-1. Install Knative:
-
-    ```
-    kubectl apply --filename https://github.com/knative/serving/releases/download/v0.3.0/serving.yaml \
-    --filename https://github.com/knative/build/releases/download/v0.3.0/release.yaml \
-    --filename https://github.com/knative/eventing/releases/download/v0.3.0/release.yaml \
-    --filename https://github.com/knative/eventing-sources/releases/download/v0.3.0/release.yaml \
-    --filename https://github.com/knative/serving/releases/download/v0.3.0/monitoring.yaml
+    ```shell
+    ibmcloud ks cluster-config <your_cluster_name>
     ```
 
-2. Monitor the Knative components until all of the components show a `STATUS` of `Running` or `Completed`:
+2. Copy and paste the output command from the previous step to set the `KUBECONFIG` environment variable and configure your CLI to run `kubectl` commands against your cluster.
 
-	Commands:
-    ```
-    kubectl get pods --namespace knative-serving
-    kubectl get pods --namespace knative-build
-    kubectl get pods --namespace knative-eventing
-    kubectl get pods --namespace knative-sources
-    kubectl get pods --namespace knative-monitoring
-    ```
-    Example Ouput:
-
-    ```
-    NAME                          READY   STATUS    RESTARTS   AGE
-    activator-df78cb6f9-jpvs7     2/2     Running   0          38s
-    activator-df78cb6f9-nhzhf     2/2     Running   0          37s
-    activator-df78cb6f9-qjg8w     2/2     Running   0          37s
-    autoscaler-6fccb66768-m4f2q   2/2     Running   0          37s
-    controller-56cf5965f5-8pwcg   1/1     Running   0          35s
-    webhook-5dcbf967cd-lxzmk      1/1     Running   0          35s
+    Example:
+    ```shell
+    export KUBECONFIG=/Users...
     ```
 
-    ```
-    NAME                                READY   STATUS    RESTARTS   AGE
-    build-controller-747b8fd966-4n8b2   1/1     Running   0          47s
-    build-webhook-6dc78d8f6d-gsm4k      1/1     Running   0          47s
-    ```
+3. Validate access to your cluster by viewing the nodes in the cluster.
 
-### Install Kaniko Build Template
-
-As a part of this lab, we will use the kaniko build template for building source into a container image from a Dockerfile, inside a container or a Kubernetes cluster. Typically, to build a container image, it is required to run a Docker daemon with root access. According to the [Kaniko github project](https://github.com/GoogleContainerTools/kaniko), "Kaniko doesn't depend on a Docker daemon and executes each command within a Dockerfile completely in userspace. This enables building container images in environments that can't easily or securely run a Docker daemon, such as a standard Kubernetes cluster."
-
-
-1. Install the kaniko build template to your cluster.
-
-    ```
-    kubectl apply --filename https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
+    ```shell
+    kubectl get node
     ```
 
-2. Use kubectl to confirm you installed the kaniko build template, as well as to see some more details about it.  You'll see that this build template accepts parameters of `IMAGE` and `DOCKERFILE`.  `IMAGE` is the name of the image you will push to the container registry, and `DOCKERFILE` is the path to the Dockerfile that will be built.
-
-	Command:
-	```
-	kubectl get BuildTemplate kaniko -o yaml
-	```
-
-	Example Output:
-	```yaml
-      spec:
-        generation: 1
-        parameters:
-        - description: The name of the image to push
-          name: IMAGE
-        - default: /workspace/Dockerfile
-          description: Path to the Dockerfile to build.
-          name: DOCKERFILE
-        steps:
-        - args:
-          - --dockerfile=${DOCKERFILE}
-          - --destination=${IMAGE}
-          image: gcr.io/kaniko-project/executor
-          name: build-and-push
-	```
 
 
 Continue on to [exercise 2](../exercise-2/README.md).

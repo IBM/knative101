@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# This tool is a variant of `kubectl get pods` and `kubectl get ksvc`.
+# It executes both commands but only shows the entries of interest during
+# a live demo. For example, it doesn't show Terminating pods.
+
+set -e
+
+clear
+
+CLUSTER=${1:-${KUBECONFIG#*/clusters/}}
+CLUSTER=${CLUSTER%%/*.yml}
+TMPFILE=/tmp/pods-tmp${RANDOM}
+
+function finish {
+  rm -f "${TMPFILE}"
+}
+trap finish EXIT
+
+while true ; do
+	echo -e "Cluster: ${CLUSTER}\\n" > $TMPFILE
+
+	kubectl get ksvc 2>&1 | while read name domain latestc latestr ready reason
+	do
+		if [[ "${name}" == "No" ]]; then
+			name="NAME"
+			latestr="LATESTREADY"
+			ready="READY"
+		fi
+
+		if [[ "${name}" == "NAME" ]]; then
+			name="K_SVC_NAME"
+		fi
+
+		printf "%-30s %-30s %-5s\033[K\\n" "${name}" "${latestr}" "${ready}" >> $TMPFILE
+	done
+
+	echo >> $TMPFILE
+
+	kubectl get pods 2>&1 | while read name ready status restarts age
+	do
+		if [[ "${name}" == "No" ]]; then
+			name="NAME"
+			status="STATUS"
+			AGE="AGE"
+		fi
+
+		if [[ "${name}" == "NAME" ]]; then
+			name="POD_NAME"
+		fi
+
+		[[ "${status}" == "Completed" ]] && continue
+		[[ "${status}" == "Terminating" ]] && continue
+
+		printf "%-55s %-15s  %s\033[K\\n" "${name}" "${status}" "${age}" >> $TMPFILE
+	done
+	! [[ "${PIPESTATUS[0]}" == "0" ]] && exit 1
+
+	echo >> $TMPFILE
+
+	clear
+	cat $TMPFILE
+	rm -f $TMPFILE
+
+	sleep 1
+done

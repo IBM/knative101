@@ -28,6 +28,8 @@ K8S_NAME=${2}
 TMPNAME=labsetup-tmp${RANDOM}
 ACCOUNT_SEARCH=${ACCOUNT_SEARCH:-" IBM  *ACTIVE"}
 
+rm -f labsetup.log
+
 # Look for required executables
 if ! which ic > /dev/null ; then
     echo "'ic' command is not installed"
@@ -55,26 +57,26 @@ if [[ `uname` == *"Darwin"* ]]; then
     base64=(base64 -b0)
 fi
 
-echo Creating registry namespace: ${NS_NAME}
-ic cr namespace-add ${NS_NAME}
+echo Creating registry namespace: ${NS_NAME} | tee -a labsetup.log
+ic cr namespace-add ${NS_NAME} >> labsetup.log 2>&1
 
-echo Creating a registry access token
+echo Creating a registry access token | tee -a labsetup.log
 ic cr token-add --description "for fibdemo" --readwrite > ${TMPNAME}-out
 token=$(grep Token ${TMPNAME}-out | grep -v -i identi | sed "s/^[^ ]*\s*\([^ ]*\) *$/\1/g")
 token64=$(echo -n "${token}" | ${base64[*]})
 rm -f ${TMPNAME}-out
 
 
-echo Switching to the IBM account to access the lab Kubernetes cluster
+echo Switching to the IBM account to access the lab Kubernetes cluster | tee -a labsetup.log
 account=$(ic account list | grep "${ACCOUNT_SEARCH}" | sed "s/ .*//")
 if [[ -z "${account}" ]]; then
     echo "Can't find the '${ACCOUNT_SEARCH}' account"
     exit 1
 fi
-ic target -c "${account}"
+ic target -c "${account}" >> labsetup.log 2>&1
 
 
-echo Retrieving the configuration for Kubernetes cluster: ${K8S_NAME}
+echo Retrieving the configuration for Kubernetes cluster: ${K8S_NAME} | tee -a labsetup.log
 bx ks cluster-config --export "${K8S_NAME}" > ${TMPNAME}-config || \
     (cat ${TMPNAME}-config && echo Error getting config && exit 1)
 config=$(cat "${TMPNAME}-config")
@@ -82,10 +84,10 @@ $(echo ${config})
 rm -f "${TMPNAME}-config"
 
 
-echo Creating the docker registry secret
+echo Creating the docker registry secret | tee -a labsetup.log
 kubectl create secret docker-registry ibm-cr-secret \
     --docker-server=https://registry.ng.bluemix.net \
-    --docker-username=token --docker-password="${token}"
+    --docker-username=token --docker-password="${token}" >> labsetup.log 2>&1
 
 # Create the basic auth Secret
 cat > ${TMPNAME}-secret <<EOF
@@ -101,8 +103,8 @@ data:
   password: ${token64}
 EOF
 
-echo Creating the basic user auth secret
-kubectl apply -f ${TMPNAME}-secret
+echo Creating the basic user auth secret | tee -a labsetup.log
+kubectl apply -f ${TMPNAME}-secret >> labsetup.log 2>&1
 rm -f ${TMPNAME}-secret
 
 # Create the ServiceAccount
@@ -117,8 +119,8 @@ imagePullSecrets:
 - name: ibm-cr-secret
 EOF
 
-echo Creating the ServiceAccount
-kubectl apply -f ${TMPNAME}-sa
+echo Creating the ServiceAccount | tee -a labsetup.log
+kubectl apply -f ${TMPNAME}-sa >> labsetup.log 2>&1
 rm -f ${TMPNAME}-sa
 
 echo

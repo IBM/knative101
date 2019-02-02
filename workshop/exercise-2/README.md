@@ -6,7 +6,7 @@ The application for this lab is a simple node.js with express app which returns 
 1. Clone the git repository:
 
     ```
-    git clone https://github.com/beemarie/fib-knative.git
+    git clone https://github.com/IBM/fib-knative.git
     ```
 2. Change directories to the fib-knative folder.
 

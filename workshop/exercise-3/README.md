@@ -1,4 +1,4 @@
-## Install Istio and Knative on Your Cluster
+## Setup: Install Istio and Knative on Your Cluster
 
 Knative is currently built on top of both Kubernetes and Istio. You will need to install Istio to install Knative. If you want to learn more, you can check out the labs [Kube101](https://github.com/IBM/kube101/tree/master/workshop) and [Istio101](https://github.com/IBM/istio101/tree/master/workshop).
 

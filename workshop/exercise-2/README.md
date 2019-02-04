@@ -1,4 +1,4 @@
-## Clone the Application Repo and Provide Container Registry Credentials
+## Setup: Clone the Application Repo and Provide Container Registry Credentials
 
 ### Clone the application repo
 The application for this lab is a simple node.js with express app which returns the first n numbers of the Fibonacci sequence. To use the app, host it, and simply make a POST request to the `/fib` endpoint with the JSON data: `{"number":10}`. We'll deploy this application using Knative later, but for now just clone it from github.

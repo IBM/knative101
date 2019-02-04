@@ -1,4 +1,4 @@
-## Create a Cluster on IBM Cloud
+## Setup: Create a Cluster on IBM Cloud
 If you have already created a cluster on IBM Cloud, and have set the context for kubectl you can skip these steps.
 
 ### Create a standard cluster

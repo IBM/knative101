@@ -1,4 +1,4 @@
-## Create IBM Cloud Account and Install Developer Tools
+## Setup: Create IBM Cloud Account and Install Developer Tools
 
 If you already have an IBM Cloud account with the following tools installed, you can skip these steps:
 

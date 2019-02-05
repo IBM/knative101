@@ -38,7 +38,7 @@ if [[ -n "${clean}" ]]; then
     set +e
     echo Cleaning - but will not uninstall Knative, Istio or delete the cluster
     rm -f out
-    $(bx ks cluster-config --export ${NAME})
+    $(bx ks cluster-config -s --export ${NAME})
 
     # exercise 3
     echo Cleaning exercise 3
@@ -123,7 +123,7 @@ if [[ -z "${lab}" ]]; then
         comment "Cluster already exists"
 
         comment "Get the config info..."
-        doit bx ks cluster-config --export ${NAME}
+        doit bx ks cluster-config -s --export ${NAME}
         doit --fakeit $(cat out)
         $(cat out)
 
@@ -148,7 +148,7 @@ if [[ -z "${lab}" ]]; then
         echo
 
         comment "Get the config info..."
-        doit bx ks cluster-config --export ${NAME}
+        doit bx ks cluster-config -s --export ${NAME}
         doit --fakeit $(cat out)
         $(cat out)
         echo
@@ -188,7 +188,7 @@ if [[ -z "${lab}" ]]; then
     echo
     doit kubectl apply -f docker-secret.yaml
     doit --noexec kubectl get secret basic-user-pass -o yaml
-    kubectl get secret basic-user-pass -o yaml | sed "s/\(password: *\).*$/\1???/"
+    kubectl get secret basic-user-pass -o yaml | sed "s/\(password: *\).*$/\1???/" | grep -v \"password\"
 
     comment Now create our service account
     scroll service-account.yaml
@@ -263,8 +263,11 @@ scroll file
 doit kubectl apply -f file
 rm file
 
-sed -i "s/bmv.*/$ING/g" forward-ingress.yaml
 scroll forward-ingress.yaml
+sed -i "s/\(^.*host: \).*/\1\"\*.$ING\"/g" forward-ingress.yaml
+comment --dopause "Ours:"
+grep "host:" forward-ingress.yaml
+echo
 doit kubectl apply -f forward-ingress.yaml
 
 
@@ -278,7 +281,7 @@ scroll service.yaml
 
 doit kubectl apply -f service.yaml
 
-comment Wait for service to build and start...
+skip=1 doit --noexec kubectl get pods --watch
 kubectl get pods
 while true ; do
     sleep 5

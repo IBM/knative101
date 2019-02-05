@@ -9,8 +9,9 @@ set -e
 # Make sure we clean-up afterwards
 trap clean EXIT
 function clean {
+    cat labsetup.log
     rm -f labsetup-tmp*
-	echo
+    echo
 }
 
 if [[ -z "$1" ]]; then
@@ -57,6 +58,11 @@ if [[ `uname` == *"Darwin"* ]]; then
     base64=(base64 -b0)
 fi
 
+# download the lab running tool, just in case people need it
+TOOLSURL=https://raw.githubusercontent.com/IBM/knative101/master/workshop/tools
+test -x .demoscript || wget -q ${TOOLSURL}/.demoscript && chmod +x .demoscript
+test -x demo || wget -q ${TOOLSURL}/demo && chmod +x demo
+
 echo Creating registry namespace: ${NS_NAME} | tee -a labsetup.log
 ic cr namespace-add ${NS_NAME} >> labsetup.log 2>&1
 
@@ -77,7 +83,8 @@ ic target -c "${account}" >> labsetup.log 2>&1
 
 
 echo Retrieving the configuration for Kubernetes cluster: ${K8S_NAME} | tee -a labsetup.log
-bx ks cluster-config --export "${K8S_NAME}" > ${TMPNAME}-config || \
+bx config --check-version false
+bx ks cluster-config -s --export "${K8S_NAME}" > ${TMPNAME}-config || \
     (cat ${TMPNAME}-config && echo Error getting config && exit 1)
 config=$(cat "${TMPNAME}-config")
 $(echo ${config})
@@ -127,3 +134,5 @@ echo
 echo Export environment variables to start using Kubernetes:
 echo 
 echo ${config}
+
+rm -f labsetup.log

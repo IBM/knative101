@@ -66,5 +66,3 @@ After installing Istio, you can install Knative. For this lab, we will install a
 
 
 Continue on to [exercise 4](../exercise-4/README.md).
-
-In the next exercise, you will build and deploy this app using Knative, which you just installed.

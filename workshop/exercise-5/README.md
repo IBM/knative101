@@ -1,47 +1,58 @@
-## Deploy vnext Version Using knctl
+## Update domain configuration for Knative
+When a Knative application is deployed, Knative will define a URL for your application. By default, Knative Serving routes use `example.com` as the default domain. The fully qualified domain name for a route by default is `{route}.{namespace}.{default-domain}`, where `{route}` is the name of the application to deploy.
 
-Did you notice that the Fibonacci sequence started with 1? Most would argue that the sequence should actually start with 0. There's a vnext version of the application at the vnext branch in the github project. We'll deploy that as v2 of our app, but instead of using kubectl, let's try the knctl tool you installed earlier.
+Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own domain.
 
+### Get the Ingress Subdomain for your IBM Kubernetes Cluster
+What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an external domain when we created our cluster. We'll first get that URL, tell Knative to assign new applications to that URL, and then forward requests to our Ingress Subdomain to the Knative Istio Gateway.
 
-### Deploy vnext
-1. Let's deploy vnext, but instead of kubectl with the service.yaml file, let's use knctl. By providing Knative with the source of our app and the image to push to the container registry, we'll get an application with a URL we can access.
-
-    ```
-    knctl deploy \
-        --service fib-knative \
-        --git-url https://github.com/IBM/fib-knative \
-        --git-revision vnext \
-        --service-account build-bot \
-        --image registry.ng.bluemix.net/<NAMESPACE>/fib-knative:vnext \
-        --managed-route=false
-    ```
-
-	This command will tell Knative to go out to github, find the code, build it into a container, and push that container to the IBM Container Registry. One thing you'll notice if you follow the output logs is that this deploy command also tags my app versions with a `latest` and a `previous` tag.
-
-2. See the revisions using knctl.
+1. First, let's get the ingress subdomain for our cluster.
 
 	```
-	knctl revisions list
+	ibmcloud ks cluster-get <my-cluster-name>
 	```
-	Expected output:
-	
+
+	Example Output:
 	```
-    Revisions
+	Ingress Subdomain:      bmv-knative.us-east.containers.appdomain.cloud   
+	```
+	Ingress is a Kubernetes service that balances network traffic workloads in your cluster by forwarding public or private requests to your apps. This Ingress Subdomain is an externally available and public URL providing access to your cluster. Take note of this Ingress Subdomain.
 
-    Service      Name               Tags      Annotations  Conditions  Age  Traffic  
-    fib-knative  fib-knative-00002  latest    -            5 OK / 5    20h  100% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
-    ~            fib-knative-00001  previous  -            5 OK / 5    20h  -
+2. Next, update the default URL for new Knative apps by editing the configuration:
 
-    2 revisions
+	```
+	kubectl edit cm config-domain --namespace knative-serving
+	```
 
-    Succeeded
-    ```
+3. Change all instances of `example.com` to your ingress subdomain, which should look something like: `bmv-knative.us-east.containers.appdomain.cloud`. There should be two instances of `example.com`, one under `data` and one under `annotations`. New Knative applications will now be assigned a route with this host, rather than `example.com`.
 
-3. Curl the application to see that 100% of the traffic is hitting your new fib-knative revision, starting the sequence with 0. Ensure you've updated the command with your own ingress subdomain.
+### Forward specific requests coming into IKS ingress to the Knative Ingress Gateway
 
-    ```
-    curl -X POST http://fib-knative.default.<ingress_subdomain>/fib -H 'Content-Type: application/json' -d '{"number":3}'
-    ```
+1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Update the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`. Remember that the fully qualified domain name for a route has the following form: `{route}.{namespace}.{domain}`.
 
+The file should look something like:
+
+```yaml
+  apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    name: iks-knative-ingress
+    namespace: istio-system
+    spec:
+      rules:
+        - host: fib-knative.default.<ingress_subdomain>
+          http:
+            paths:
+              - path: /
+                backend:
+                  serviceName: knative-ingressgateway
+                  servicePort: 80
+```
+
+2. Apply the ingress rule.
+
+	```
+	kubectl apply --filename forward-ingress.yaml
+	```
 
 Continue on to [exercise 6](../exercise-6/README.md).

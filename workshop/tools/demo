@@ -205,14 +205,14 @@ if [[ -z "${lab}" ]]; then
         doit ibmcloud ks cluster-addon-enable knative -y --cluster ${NAME}
     
         comment "Wait until Knative is ready..."
-	    wait "kubectl get ns | grep knative-serving"
-	    comment "Knative namespace is there, now waiting for pods..."
+        wait "kubectl get ns | grep knative-serving"
+        comment "Knative namespace is there, now waiting for pods..."
     
-	    wait "kubectl get pods -n knative-serving | grep controller"
+        wait "kubectl get pods -n knative-serving | grep controller"
         wait ! "kubectl get pods --namespace knative-serving | \
             grep -v Terminating | grep -v NAME | grep -v Running"
     
-	    doit kubectl get pods --namespace knative-build
+        doit kubectl get pods --namespace knative-build
     else
         comment Knative is already installed
     fi
@@ -229,7 +229,7 @@ else  # Running the lab
     # doit --fakeit ${exp}
     # $(${exp})
 
-	echo -n
+    echo -n
 fi
 
 ###### End of exercise 3
@@ -326,7 +326,7 @@ doit knctl rollout --route fib-knative -p fib-knative:latest=50% \
 
 doit knctl route list
 
-doit --noscroll --ignorerc timeout 30 bash -c \"while sleep 0.5\; do curl -sX POST \\\"http://fib-knative.default.knative102.us-south.containers.appdomain.cloud/fib\\\" -H Content-Type:application/json   -d \'{\\\"number\\\":1}\' \; done\"
+doit --noscroll --ignorerc timeout 30 bash -c \"while sleep 0.5\; do curl -sX POST \\\"http://fib-knative.default.$ING/fib\\\" -H Content-Type:application/json   -d \'{\\\"number\\\":1}\' \; done\"
 
 rm -f cmds out
 cd .. && rm -f cmds out

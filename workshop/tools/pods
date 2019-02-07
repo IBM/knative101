@@ -37,8 +37,10 @@ trap finish EXIT
 
 oldSize=0
 
-bx config --check-version false
-$(bx ks cluster-config -s --export ${CLUSTER})
+if ! [[ "${KUBECONFIG}" == *"${CLUSTER}".yml ]]; then
+  bx config --check-version false
+  $(bx ks cluster-config -s --export ${CLUSTER})
+fi
 
 while true ; do
     printf "Cluster: ${CLUSTER}\033[K\\n" > $TMPFILE

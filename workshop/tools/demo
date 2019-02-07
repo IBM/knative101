@@ -199,48 +199,25 @@ if [[ -z "${lab}" ]]; then
 
     ### End of exercise 2
 
-    comment Checking to see if Istio and Knative are installed
-    kubectl get ns > out.sav
-
-    if ! grep istio-system out.sav > /dev/null 2>&1 ; then
-        # comment Install Istio
-        # doit bx ks cluster-addon-enable istio --cluster ${NAME}
-
-        comment Install Istio CRDs
-        doit --noscroll kubectl apply -f \
-         https://github.com/knative/serving/releases/download/v0.2.2/istio-crds.yaml
-
-        comment Install Istio
-        doit --noscroll kubectl apply -f \
-            https://github.com/knative/serving/releases/download/v0.2.2/istio.yaml
-
-        comment "Enable Istio auto-sidecar injection for the 'default' namespace"
-        doit kubectl label namespace default istio-injection=enabled
-
-        comment "Wait until Istio is done installing..."
-        # Don't check that we're done too quickly, wait for the galley pod to appear
-        wait "kubectl get pods --namespace istio-system | grep istio-galley"
-
-        wait ! "kubectl get pods --namespace istio-system | grep -v NAME | \
-            grep -v Completed | grep -v Running"
-    fi
-
+    kubectl get ns > out
     if ! grep knative-serving out.sav > /dev/null 2>&1 ; then
-        # comment Install Istio
-        # doit bx ks cluster-addon-enable istio --cluster ${NAME}
-
-        comment Install Knative
-        doit --noscroll kubectl apply -f \
-            https://github.com/knative/serving/releases/download/v0.2.2/release.yaml
-        doit --noscroll kubectl apply -f knative.yaml
-        bx ks cluster-addon-enable knative --cluster ${NAME}
-
-        comment Wait until Knative is ready...
+        comment "Install Knative (and Istio)"
+        doit ibmcloud ks cluster-addon-enable knative -y --cluster ${NAME}
+    
+        comment "Wait until Knative is ready..."
+	    wait "kubectl get ns | grep knative-serving"
+	    comment "Knative namespace is there, now waiting for pods..."
+    
+	    wait "kubectl get pods -n knative-serving | grep controller"
         wait ! "kubectl get pods --namespace knative-serving | \
             grep -v Terminating | grep -v NAME | grep -v Running"
+    
+	    doit kubectl get pods --namespace knative-build
+    else
+        comment Knative is already installed
     fi
+    rm out
 
-    rm -f out.sav
 else  # Running the lab
     # rm -rf fib-knative
     # doit git clone https://github.com/IBM/fib-knative.git
@@ -252,24 +229,7 @@ else  # Running the lab
     # doit --fakeit ${exp}
     # $(${exp})
 
-	kubectl get ns > out
-    if ! grep knative-serving out.sav > /dev/null 2>&1 ; then
-        # comment "Install Knative (and Istio)"
-        doit ibmcloud ks cluster-addon-enable knative -y --cluster ${NAME}
-
-        comment "Wait until Knative is ready..."
-		wait "kubectl get ns | grep knative-serving"
-		comment "Knative namespace is there, now waiting for pods..."
-
-		wait "kubectl get pods -n knative-serving | grep controller"
-        wait ! "kubectl get pods --namespace knative-serving | \
-            grep -v Terminating | grep -v NAME | grep -v Running"
-
-	    doit kubectl get pods --namespace knative-build
-	else
-	    comment Knative is already installed
-    fi
-	rm out
+	echo -n
 fi
 
 ###### End of exercise 3

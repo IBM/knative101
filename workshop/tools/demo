@@ -242,15 +242,16 @@ if [[ -z "${lab}" ]]; then
 
     rm -f out.sav
 else
-    rm -rf fib-knative
-    doit git clone https://github.com/IBM/fib-knative.git
-    doit --fakeit cd fib-knative
-    cd fib-knative
+    # rm -rf fib-knative
+    # doit git clone https://github.com/IBM/fib-knative.git
+    # doit --fakeit cd fib-knative
+    # cd fib-knative
 
-    doit labsetup "${CRNS}" "${NAME}"
-    exp=$(grep export out | sed "s/$\s*//" | sed "s/\s*$//")
-    doit --fakeit ${exp}
-    $(${exp})
+    # doit labsetup "${CRNS}" "${NAME}"
+    # exp=$(grep export out | sed "s/$\s*//" | sed "s/\s*$//")
+    # doit --fakeit ${exp}
+    # $(${exp})
+	echo
 fi
 
 ###### End of exercise 3

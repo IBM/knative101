@@ -40,12 +40,12 @@ if [[ -n "${clean}" ]]; then
     set +e
     echo Cleaning - but will not uninstall Knative, Istio or delete the cluster
     rm -f out
-    $(bx ks cluster-config -s --export ${NAME})
+    $(ibmcloud ks cluster-config -s --export ${NAME})
 
     # exercise 3
     echo Cleaning exercise 3
-    bx cr image-rm registry.ng.bluemix.net/${CRNS}/fib-knative
-    kubectl delete ksvc/fib-knative
+    ibmcloud cr image-rm registry.ng.bluemix.net/${CRNS}/fib-knative >> out 2>&1
+    kubectl delete ksvc/fib-knative >> out 2>&1
 
     # exercise 2
     echo Cleaning exercise 2
@@ -53,12 +53,12 @@ if [[ -n "${clean}" ]]; then
     kubectl delete secret/basic-user-pass >> out 2>&1
     kubectl delete secret/ibm-cr-secret >> out 2>&1
 
-    bx cr tokens | grep "for fibdemo" | while read a b ; do
-        yes | bx cr token-rm $a
+    ibmcloud cr tokens | grep "for fibdemo" | while read a b ; do
+        ibmcloud cr token-rm -f $a
     done
 
-    bx cr namespace-list | grep fibdemo- | while read a ; do
-        yes | bx cr namespace-rm $a
+    ibmcloud cr namespace-list | grep fibdemo- | while read a ; do
+        ibmcloud cr namespace-rm -f $a
     done
 
     rm -rf fib-knative >> out 2>&1
@@ -88,17 +88,17 @@ comment Use 'r' to stop pausing
 
 # Add checks for needed tools here - exercise 0
 
-if ! which ic > /dev/null ; then
+if ! which ibmcloud > /dev/null ; then
     echo Missing 'ic' command
     exit 1
 fi
 
-if ! ic ks  > /dev/null 2>&1 ; then
-    doit ic plugin install ks
+if ! ibmcloud ks  > /dev/null 2>&1 ; then
+    doit ibmcloud plugin install ks
 fi
 
-if ! ic cr  > /dev/null 2>&1 ; then
-    doit ic plugin install cr
+if ! ibmcloud cr  > /dev/null 2>&1 ; then
+    doit ibmcloud plugin install cr
 fi
 
 if ! which kubectl > /dev/null 2>&1 ; then
@@ -121,27 +121,27 @@ PATH=.:$PATH
 
 if [[ -z "${lab}" ]]; then
     comment "Checking to see if the cluster (${NAME}) already exists..."
-    if bx ks clusters | grep "^${NAME} .* normal "; then
+    if ibmcloud ks clusters | grep "^${NAME} .* normal "; then
         comment "Cluster already exists"
 
         comment "Get the config info..."
-        doit bx ks cluster-config -s --export ${NAME}
+        doit ibmcloud ks cluster-config -s --export ${NAME}
         doit --fakeit $(cat out)
         $(cat out)
 
     else
         comment "Gathering vlan info..."
-        skip=1 doit bx ks vlans --zone $ZONE
+        skip=1 doit ibmcloud ks vlans --zone $ZONE
         PRI_VLAN=$(grep private out | sed "s/ .*//")
         PUB_VLAN=$(grep public out | sed "s/ .*//")
 
         # Create the cluster
-        doit echo bx ks cluster-create --name ${NAME} --zone ${ZONE} \
+        doit echo ibmcloud ks cluster-create --name ${NAME} --zone ${ZONE} \
             --machine-type ${MACHINE} --workers ${WORKERS} \
             --private-vlan ${PRI_VLAN} --public-vlan ${PUB_VLAN}
 
         comment "Waiting for cluster to be created..."
-        while ! (bx ks clusters | tee tmpout | grep "^$NAME " | grep " normal ")
+        while ! (ibmcloud ks clusters | tee tmpout | grep "^$NAME " | grep " normal ")
         do
             grep "^${NAME} " tmpout || true
             sleep 30
@@ -150,7 +150,7 @@ if [[ -z "${lab}" ]]; then
         echo
 
         comment "Get the config info..."
-        doit bx ks cluster-config -s --export ${NAME}
+        doit ibmcloud ks cluster-config -s --export ${NAME}
         doit --fakeit $(cat out)
         $(cat out)
         echo
@@ -165,16 +165,16 @@ if [[ -z "${lab}" ]]; then
     doit --fakeit cd fib-knative
     cd fib-knative
 
-    doit bx cr namespace-add ${CRNS}
+    doit ibmcloud cr namespace-add ${CRNS}
 
-    doit --noexec bx cr token-add --description \"for fibdemo\" --readwrite
-    bx cr token-add --description "for fibdemo" --readwrite > out 2>&1
+    doit --noexec ibmcloud cr token-add --description \"for fibdemo\" --readwrite
+    ibmcloud cr token-add --description "for fibdemo" --readwrite > out 2>&1
     cat out | sed "s/\(Token        *\).*/\1???/g"
     token=$(grep Token out | grep -v -i identi | sed "s/^[^ ]*\s*\([^ ]*\) *$/\1/g")
     token64=$(echo -n "${token}" | ${base64[*]})
 
-    doit --noexec bx cr token-list
-    bx cr token-list | grep -v true
+    doit --noexec ibmcloud cr token-list
+    ibmcloud cr token-list | grep -v true
 
     doit --noexec kubectl create secret docker-registry ibm-cr-secret \
         --docker-server=https://registry.ng.bluemix.net \
@@ -241,7 +241,7 @@ if [[ -z "${lab}" ]]; then
     fi
 
     rm -f out.sav
-else
+else  # Running the lab
     # rm -rf fib-knative
     # doit git clone https://github.com/IBM/fib-knative.git
     # doit --fakeit cd fib-knative
@@ -251,12 +251,50 @@ else
     # exp=$(grep export out | sed "s/$\s*//" | sed "s/\s*$//")
     # doit --fakeit ${exp}
     # $(${exp})
-	echo
+
+	kubectl get ns > out
+    if ! grep knative-serving out.sav > /dev/null 2>&1 ; then
+        # comment "Install Knative (and Istio)"
+        doit ibmcloud ks cluster-addon-enable knative -y --cluster ${NAME}
+
+        comment "Wait until Knative is ready..."
+		wait "kubectl get ns | grep knative-serving"
+		comment "Knative namespace is there, now waiting for pods..."
+
+		wait "kubectl get pods -n knative-serving | grep controller"
+        wait ! "kubectl get pods --namespace knative-serving | \
+            grep -v Terminating | grep -v NAME | grep -v Running"
+
+	    doit kubectl get pods --namespace knative-build
+	else
+	    comment Knative is already installed
+    fi
+	rm out
 fi
 
 ###### End of exercise 3
 
-doit bx ks cluster-get ${NAME}
+scroll fib-service.yaml
+
+doit kubectl apply --filename fib-service.yaml
+
+doit --noexec kubectl get pods --watch
+pods --grep "fib-knative.*Running"
+echo
+
+doit kubectl get svc istio-ingressgateway --namespace istio-system
+IP=$(grep istio-ingressgateway out | sed "s/.*LoadB[^ ]*  *[^ ]*  *//" | sed "s/ .*//")
+
+doit kubectl get ksvc fib-knative --output=custom-columns=NAME:.metadata.name,DOMAIN:.status.domain
+HOST=$(grep fib-knative out | sed "s/^[^ ]*  *//" | sed "s/ *$//")
+
+doit "curl -sX POST -H 'Host: ${HOST}' -H 'Content-Type: application/json' "${IP}"/fib -d '{\"number\":5}'"
+echo
+
+
+###### End of exercise 4
+
+doit ibmcloud ks cluster-get ${NAME}
 comment Notice the "'Ingress Subdomain'" line
 ING=$(grep Subdomain out | sed "s/.*: *//" | sed "s/ *$//")
 doit "kubectl get cm config-domain --namespace knative-serving -o yaml > file"
@@ -274,6 +312,8 @@ echo
 doit kubectl apply -f forward-ingress.yaml
 
 
+###### End of exercise 5
+
 comment Install the kaniko build template
 doit kubectl apply -f https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
 
@@ -285,23 +325,24 @@ scroll service.yaml
 doit kubectl apply -f service.yaml
 
 skip=1 doit --noexec kubectl get pods --watch
-kubectl get pods
-while true ; do
-    sleep 5
-    kubectl get pods | grep fib-knative 2>&1 | tee out
-    cat out | grep fib-knative.*deployment.*Running > /dev/null || continue
-    break
-done
+pods --grep "fib-knative.*02.*dep.*Running"
+# kubectl get pods
+# while true ; do
+    # sleep 5
+    # kubectl get pods | grep fib-knative 2>&1 | tee out
+    # cat out | grep fib-knative.*deployment.*Running > /dev/null || continue
+    # break
+# done
 echo
 
-doit kubectl get pods
+# doit kubectl get pods
 
-# doit bx cr image-list
+# doit ibmcloud cr image-list
 
 doit curl -sX POST http://fib-knative.default.$ING/fib -H 'Content-Type:application/json' -d \'{\"number\":20}\'
 echo
 
-### End of exercise 4
+### End of exercise 6
 
 doit knctl deploy \
     --service fib-knative \
@@ -314,8 +355,9 @@ doit knctl deploy \
 doit knctl revisions list
 
 doit curl -sX POST http://fib-knative.default.$ING/fib -H 'Content-Type:application/json' -d \'{\"number\":20}\'
+echo
 
-### End of exercise 5
+### End of exercise 7
 
 doit knctl route list
 
@@ -324,7 +366,7 @@ doit knctl rollout --route fib-knative -p fib-knative:latest=50% \
 
 doit knctl route list
 
-doit --ignorerc timeout 30 bash -c \"while sleep 0.5\; do curl -sX POST \\\"http://fib-knative.default.knative102.us-south.containers.appdomain.cloud/fib\\\" -H Content-Type:application/json   -d \'{\\\"number\\\":1}\' \; done\"
+doit --noscroll --ignorerc timeout 30 bash -c \"while sleep 0.5\; do curl -sX POST \\\"http://fib-knative.default.knative102.us-south.containers.appdomain.cloud/fib\\\" -H Content-Type:application/json   -d \'{\\\"number\\\":1}\' \; done\"
 
 rm -f cmds out
 cd .. && rm -f cmds out

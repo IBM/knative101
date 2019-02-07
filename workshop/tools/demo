@@ -5,6 +5,8 @@
 
 set -e
 
+PATH=$PATH:$PWD/tools:$PWD
+
 source $(dirname "$0")/.demoscript
 RETRYONFAIL=1
 

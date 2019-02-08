@@ -13,7 +13,7 @@ Maybe we want to slowly roll users over from our old version to the new version,
 	Routes in namespace 'default'
 
 	Name         Domain                                                              Traffic                   Annotations  Conditions  Age  
-	fib-knative  fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  100% -> fib-knative  -            3 OK / 3    20h  
+	fib-knative  fib-knative.default.mycluster6.us-south.containers.appdomain.cloud  100% -> fib-knative  -            3 OK / 3    20h  
 
 	1 routes
 
@@ -37,7 +37,7 @@ Maybe we want to slowly roll users over from our old version to the new version,
 	Routes in namespace 'default'
 
 	Name         Domain                                                              Traffic                   Annotations  Conditions  Age  
-	fib-knative  fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  50% -> fib-knative-00003  -            3 OK / 3    15h  
+	fib-knative  fib-knative.default.mycluster6.us-south.containers.appdomain.cloud  50% -> fib-knative-00003  -            3 OK / 3    15h  
                                                                                  	 50% -> fib-knative-00002                             
 
 	1 routes
@@ -45,7 +45,7 @@ Maybe we want to slowly roll users over from our old version to the new version,
 	Succeeded
 	```
 
-3. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called. Ensure you've replaced <ingress_subdomain> with your own ingress subdomain.
+3. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called. Ensure you've replaced `<ingress_subdomain>` with your own ingress subdomain.
 
 	```
 	while sleep 0.5; do curl -X POST "http://fib-knative.default.<ingress_subdomain>/fib" -H 'Content-Type: application/json'   -d '{"number":1}' ; done

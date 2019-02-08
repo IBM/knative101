@@ -14,7 +14,7 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 
 	Example Output:
 	```
-	Ingress Subdomain:      bmv-knative.us-east.containers.appdomain.cloud   
+	Ingress Subdomain:      mycluster6.us-south.containers.appdomain.cloud   
 	```
 	Ingress is a Kubernetes service that balances network traffic workloads in your cluster by forwarding public or private requests to your apps. This Ingress Subdomain is an externally available and public URL providing access to your cluster. Take note of this Ingress Subdomain.
 
@@ -24,11 +24,11 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 	kubectl edit cm config-domain --namespace knative-serving
 	```
 
-3. Change all instances of `example.com` to your ingress subdomain, which should look something like: `bmv-knative.us-east.containers.appdomain.cloud`. There should be two instances of `example.com`, one under `data` and one under `annotations`. New Knative applications will now be assigned a route with this host, rather than `example.com`.
+3. Change all instances of `example.com` to your ingress subdomain, which should look something like: `mycluster6.us-south.containers.appdomain.cloud`. There should be one instance of `example.com` under `data`. New Knative applications will now be assigned a route with this host, rather than `example.com`.
 
 ### Forward specific requests coming into IKS ingress to the Knative Ingress Gateway
 
-1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Update the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`. Remember that the fully qualified domain name for a route has the following form: `{route}.{namespace}.{domain}`.
+1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Edit the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`. Remember that the fully qualified domain name for a route has the following form: `{route}.{namespace}.{domain}`.
 
 The file should look something like:
 
@@ -61,7 +61,7 @@ Now that we've setup our DNS routing, let's try our `curl` command again
 using the DNS hostname:
 
 ```
-curl -X POST -H 'Content-Type: application/json' fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -d '{"number":5}'
+curl -X POST -H 'Content-Type: application/json' fib-knative.default.<ingress_subdomain>/fib -d '{"number":5}'
 ```
 
 Expected Output:

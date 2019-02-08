@@ -49,7 +49,7 @@ A Knative BuildTemplate encapsulates a shareable build process with some limited
 	```
 	kubectl apply -f service.yaml
 	```
-3. Run `kubectl get pods --watch` to see the pods initializing.
+3. Run `kubectl get pods --watch` to see the pods initializing. Note: To exit the watch, use `ctrl + c`.
 
 4. Take a look at the `service.yaml` file again. The service.yaml file defines the required Knative components to build the application from source code in the git repository, push the built container image to the private container registry, and then run the application with the provide URL. 
 
@@ -60,7 +60,7 @@ A Knative BuildTemplate encapsulates a shareable build process with some limited
 	```
 6. You should see the first 20 Fibonacci numbers!
 
-7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state.
+7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state. Note: To exit the watch, use `ctrl + c`.
 
 	Expected Output:
 	```

@@ -29,7 +29,7 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
     Revisions
 
     Service      Name               Tags      Annotations  Conditions  Age  Traffic  
-    fib-knative  fib-knative-00003  latest    -            5 OK / 5    45s  100% -> fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud  
+    fib-knative  fib-knative-00003  latest    -            5 OK / 5    45s  100% -> fib-knative.default.mycluster6.us-south.containers.appdomain.cloud  
     ~            fib-knative-00002  previous  -            5 OK / 5    3m   -  
     ~            fib-knative-00001  -         -            5 OK / 5    3m   - 
 

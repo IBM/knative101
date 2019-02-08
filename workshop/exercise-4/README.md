@@ -42,6 +42,8 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with a 
     kubectl get pods --watch
     ```
 
+    Note: To exit the watch, use `ctrl + c`.
+
 4. Let's try out our new application! First, we'll need to know the external IP for our service. Run the following command, and note the value for `EXTERNAL-IP`.
 
     ```
@@ -70,5 +72,7 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with a 
     ```
     kubectl get pods --watch
     ```
+
+    Note: To exit the watch, use `ctrl + c`.
 
 Continue on to [exercise 5](../exercise-5/README.md).

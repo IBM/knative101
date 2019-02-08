@@ -213,8 +213,9 @@ else  # Running the lab
     echo -n
 fi
 
-kubectl get ns > out
-if ! grep knative-serving out.sav > /dev/null 2>&1 ; then
+doit ibmcloud plugin update --all
+
+if ! kubectl get ns knative-serving > /dev/null 2>&1 ; then
     comment "Install Knative (and Istio)"
     doit ibmcloud ks cluster-addon-enable knative -y --cluster ${NAME}
 
@@ -230,7 +231,6 @@ if ! grep knative-serving out.sav > /dev/null 2>&1 ; then
 else
     comment Knative is already installed
 fi
-rm out
 
 
 ###### End of exercise 3
@@ -269,6 +269,8 @@ grep "host:" forward-ingress.yaml
 echo
 doit kubectl apply -f forward-ingress.yaml
 
+doit curl -sX POST -H 'Content-Type:application/json' http://fib-knative.default.$ING/fib -d \'{\"number\":20}\'
+echo
 
 ###### End of exercise 5
 

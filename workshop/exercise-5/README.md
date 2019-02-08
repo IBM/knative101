@@ -55,4 +55,18 @@ The file should look something like:
 	kubectl apply --filename forward-ingress.yaml
 	```
 
+### Try it again
+
+Now that we've setup our DNS routing, let's try our `curl` command again
+using the DNS hostname:
+
+```
+curl -X POST -H 'Content-Type: application/json' fib-knative.default.bmv-knative.us-east.containers.appdomain.cloud/fib -d '{"number":5}'
+```
+
+Expected Output:
+```
+[1,1,2,3,5]
+```
+
 Continue on to [exercise 6](../exercise-6/README.md).

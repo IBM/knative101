@@ -258,12 +258,9 @@ echo
 doit ibmcloud ks cluster-get ${NAME}
 comment Notice the "'Ingress Subdomain'" line
 ING=$(grep Subdomain out | sed "s/.*: *//" | sed "s/ *$//")
-doit "kubectl get cm config-domain --namespace knative-serving -o yaml > file"
-scroll file
-doit sed -i \"s/example.com/$ING/\" file
-scroll file
-doit kubectl apply -f file
-rm file
+doit --noexec  "echo -e ':1,\$s/example.com/$ING/g\\n:wq\\n' | kubectl edit cm config-domain -n knative-serving"
+echo -e ":1,\$s/example.com/$ING/g\n:wq\n" | kubectl edit cm config-domain -n knative-serving
+doit kubectl get cm config-domain -n knative-serving -o yaml
 
 scroll forward-ingress.yaml
 sed -i "s/\(^.*host: \).*/\1\"\*.$ING\"/g" forward-ingress.yaml
@@ -305,7 +302,7 @@ echo
 
 ### End of exercise 6
 
-doit knctl deploy \
+doit --noscroll knctl deploy \
     --service fib-knative \
     --git-url https://github.com/IBM/fib-knative \
     --git-revision vnext \

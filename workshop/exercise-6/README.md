@@ -51,7 +51,7 @@ A Knative BuildTemplate encapsulates a shareable build process with some limited
 	```
 3. Run `kubectl get pods --watch` to see the pods initializing. Note: To exit the watch, use `ctrl + c`.
 
-4. Take a look at the `service.yaml` file again. The service.yaml file defines the required Knative components to build the application from source code in the git repository, push the built container image to the private container registry, and then run the application with the provide URL. 
+4. Take a look at the `service.yaml` file again. The service.yaml file defines the required Knative components to build the application from source code in the git repository and push the built container image to the private container registry. Then it'll replace the currently running version of the application with this new one.
 
 5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us. Esnure you've updated the command with your own ingress subdomain.
 

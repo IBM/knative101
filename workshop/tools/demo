@@ -310,21 +310,21 @@ doit --noscroll knctl deploy \
     --git-revision vnext \
     --service-account build-bot \
     --image registry.ng.bluemix.net/${CRNS}/fib-knative:vnext \
-    --managed-route=false
+    --managed-route=false --tty
 
-doit knctl revisions list
+doit knctl revisions list --tty
 
 doit curl -sX POST http://fib-knative.default.$ING/fib -H 'Content-Type:application/json' -d \'{\"number\":20}\'
 echo
 
 ### End of exercise 7
 
-doit knctl route list
+doit knctl route list --tty
 
 doit knctl rollout --route fib-knative -p fib-knative:latest=50% \
-    -p fib-knative:previous=50%
+    -p fib-knative:previous=50% --tty
 
-doit knctl route list
+doit knctl route list --tty
 
 doit --noscroll --ignorerc timeout 30 bash -c \"while sleep 0.5\; do curl -sX POST \\\"http://fib-knative.default.$ING/fib\\\" -H Content-Type:application/json   -d \'{\\\"number\\\":1}\' \; done\"
 

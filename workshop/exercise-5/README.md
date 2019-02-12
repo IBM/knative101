@@ -45,7 +45,7 @@ The file should look something like:
             paths:
               - path: /
                 backend:
-                  serviceName: knative-ingressgateway
+                  serviceName: istio-ingressgateway
                   servicePort: 80
 ```
 

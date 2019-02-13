@@ -269,7 +269,7 @@ grep "host:" forward-ingress.yaml
 echo
 doit kubectl apply -f forward-ingress.yaml
 
-doit curl -sX POST -H 'Content-Type:application/json' http://fib-knative.default.$ING/fib -d \'{\"number\":20}\'
+doit curl -sX POST -H 'Content-Type:application/json' http://fib-knative.default.$ING/fib -d \'{\"number\":5}\'
 echo
 
 ###### End of exercise 5

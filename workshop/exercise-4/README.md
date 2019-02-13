@@ -50,10 +50,10 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with a 
     kubectl get svc istio-ingressgateway --namespace istio-system
     ```
 
-5. We will also need to know the domain name that Knative assigned to the Service we just deployed. Run the following command, and note the value for `DOMAIN`.
+5. We will also need to know the domain name that Knative assigned to the Service we just deployed. Run the following command, and note the value for `domain`.
 
     ```
-    kubectl get ksvc fib-knative --output=custom-columns=NAME:.metadata.name,DOMAIN:.status.domain
+    kubectl get ksvc fib-knative
     ```
 
 6. You'll notice that the domain name is `fib-service.default.example.com`, but we don't actually own anything at `example.com`. We'll see how to update this to our own domain name later, but for now we can directly curl the external IP address for our cluster, and pass in a Host header. Notice that we're calling the `/fib` endpoint, and passing in a `number` value of 5. This should return the first 5 numbers of the fibonacci sequence.

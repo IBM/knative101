@@ -61,7 +61,7 @@ Now that we've setup our DNS routing, let's try our `curl` command again
 using the DNS hostname:
 
 ```
-curl -X POST -H 'Content-Type: application/json' fib-knative.default.<ingress_subdomain>/fib -d '{"number":5}'
+curl fib-knative.default.<ingress_subdomain>/5
 ```
 
 Expected Output:

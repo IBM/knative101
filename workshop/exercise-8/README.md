@@ -48,7 +48,7 @@ Maybe we want to slowly roll users over from our old version to the new version,
 3. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called. Ensure you've replaced `<ingress_subdomain>` with your own ingress subdomain.
 
 	```
-	while sleep 0.5; do curl -X POST "http://fib-knative.default.<ingress_subdomain>/fib" -H 'Content-Type: application/json'   -d '{"number":1}' ; done
+	while sleep 0.5; do curl "http://fib-knative.default.<ingress_subdomain>/1" ; done
 	```
 
 4. We should see that the curl requests are routed approximately 50/50 between the two applications. Let's kill this process using ctrl-c.

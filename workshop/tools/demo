@@ -249,7 +249,7 @@ IP=$(grep istio-ingressgateway out | sed "s/.*LoadB[^ ]*  *[^ ]*  *//" | sed "s/
 doit kubectl get ksvc fib-knative --output=custom-columns=NAME:.metadata.name,DOMAIN:.status.domain
 HOST=$(grep fib-knative out | sed "s/^[^ ]*  *//" | sed "s/ *$//")
 
-doit curl -s -H 'Host: ${HOST}' "${IP}/5"
+doit curl -s -H "\"Host:${HOST}\"" "${IP}/5"
 echo
 
 

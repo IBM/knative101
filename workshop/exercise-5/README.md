@@ -33,20 +33,20 @@ What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an e
 The file should look something like:
 
 ```yaml
-  apiVersion: extensions/v1beta1
-  kind: Ingress
-  metadata:
-    name: iks-knative-ingress
-    namespace: istio-system
-    spec:
-      rules:
-        - host: fib-knative.default.<ingress_subdomain>
-          http:
-            paths:
-              - path: /
-                backend:
-                  serviceName: istio-ingressgateway
-                  servicePort: 80
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: iks-knative-ingress
+  namespace: istio-system
+spec:
+  rules:
+    - host: fib-knative.default.<ingress_subdomain>
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: istio-ingressgateway
+              servicePort: 80
 ```
 
 2. Apply the ingress rule.

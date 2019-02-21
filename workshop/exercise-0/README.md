@@ -43,7 +43,7 @@ The Knative command-line tool, knctl provides a set of commands to interact with
 1. Install knctl using one of the prebuilt binaries from their [release page](https://github.com/cppforlife/knctl/releases), and run the following commands:
 
     ```
-    shasum -a 265 ~/Downloads/knctl-*
+    shasum -a 256 ~/Downloads/knctl-*
     # Compare checksum output to what's included in the release notes
 
     mv ~/Downloads/knctl-* /usr/local/bin/knctl

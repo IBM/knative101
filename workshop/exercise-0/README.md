@@ -13,7 +13,7 @@ If you already have an IBM Cloud account with the following tools installed, you
 
 ### Installing the IBM Cloud developer tools and plugins
 
-1. Download and install the `ibmcloud` [command line tool](https://cloud.ibm.com/docs/cli/index.html#overview)
+1. Download and install the `ibmcloud` [command line tool.](https://cloud.ibm.com/docs/cli/index.html#overview)
 
 1. Install the `ks` (kubernetes-service) plugin:
 

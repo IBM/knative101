@@ -51,7 +51,7 @@ Maybe we want to slowly roll users over from our old version to the new version,
 	while sleep 0.5; do curl "http://fib-knative.default.<ingress_subdomain>/1" ; done
 	```
 
-4. We should see that the curl requests are routed approximately 50/50 between the two applications. Let's kill this process using ctrl-c.
+4. We should see that the curl requests are routed approximately 50/50 between the two applications. Let's kill this process using `ctrl + c`.
 
 
 At this point, you should feel that you've had a whirlwind tour of Knative. We installed Istio & Knative onto a Kubernetes cluster. We deployed a serverless application and saw it scale up and then back down when it was no longer in use. We also explored the knctl tool to easily create routing rules and deploy serverless applications. Please reach out should you have any questions or issues going through this lab!

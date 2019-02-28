@@ -1,5 +1,5 @@
 ## Setup: Create a Cluster on IBM Cloud
-If you have already created a cluster on IBM Cloud, and have set the context for kubectl you can skip these steps.
+If you have already created a cluster on IBM Cloud and have set the context for kubectl you can skip these steps.
 
 ### Create a standard cluster
 This lab requires a standard (paid) cluster. Create a new standard cluster from the [IBM Cloud UI](https://cloud.ibm.com/containers-kubernetes/catalog/cluster/create).
@@ -40,7 +40,5 @@ Set the context for your cluster in your CLI. Every time you log in to the CLI t
     ```shell
     kubectl get node
     ```
-
-
-
+    
 Continue on to [exercise 2](../exercise-2/README.md).

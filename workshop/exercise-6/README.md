@@ -56,7 +56,7 @@ A Knative BuildTemplate encapsulates a shareable build process with some limited
 5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us. Esnure you've updated the command with your own ingress subdomain.
 
 	```
-	curl http://fib-knative.default.<ingress_subdomain>/20
+	curl http://fib-knative.default.$MYINGRESS/20
 	```
 6. You should see the first 20 Fibonacci numbers!
 

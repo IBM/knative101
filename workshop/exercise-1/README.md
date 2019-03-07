@@ -13,10 +13,16 @@ components, the recommended configuration for a cluster is:
 
 3. Click `Create Cluster`.
 
+4. Export the cluster name you chose as an environment variable for use in the lab.
+
+    ```
+    export MYCLUSTER=<your_cluster_name>
+    ```
+
 4. Wait while your cluster is fully deployed. Repeat this command until the state of the cluster is `normal`.
 
     ```
-    ibmcloud ks clusters | grep <your_cluster_name>
+    ibmcloud ks clusters | grep $MYCLUSTER
     ```
 
 ### Set context for kubectl
@@ -25,7 +31,7 @@ Set the context for your cluster in your CLI. Every time you log in to the CLI t
 1. Download the configuration file and certificates for your cluster using the `cluster-config` command.
 
     ```shell
-    ibmcloud ks cluster-config <your_cluster_name>
+    ibmcloud ks cluster-config $MYCLUSTER
     ```
 
 2. Copy and paste the output command from the previous step to set the `KUBECONFIG` environment variable and configure your CLI to run `kubectl` commands against your cluster.

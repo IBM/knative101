@@ -19,7 +19,7 @@ automatically.
 2. Next ask for Knative to be installed:
 
     ```
-	ibmcloud ks cluster-addon-enable knative --cluster <your_cluster_name>
+	ibmcloud ks cluster-addon-enable knative --cluster $MYCLUSTER
 	```
 
 3. The install process may take a minute or two. To know when it's done you

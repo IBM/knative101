@@ -4,7 +4,7 @@ Knative is currently built on top of both Kubernetes and Istio.
 If you want to learn more about Kubernetes or Istio, you can check out the
 labs [Kube101](https://github.com/IBM/kube101/tree/master/workshop) and
 [Istio101](https://github.com/IBM/istio101/tree/master/workshop).
-Luckily, when you install Knative on IKS, it will install Istio for you
+When you install Knative on IKS, it will install Istio for you
 automatically.
 
 ### Install Knative
@@ -59,7 +59,7 @@ automatically.
    ```
 
    You could check the pods in all of the Knative namespaces, but for this
-   workshop really only "serving" and "build" are required.
+   workshop only "serving" and "build" are required.
    
 
    Example Ouput:
@@ -74,7 +74,6 @@ automatically.
    webhook-5dcbf967cd-lxzmk      1/1     Running   0          35s
    ```
 
-   If all of the pods shown are in a `Running`, or `Completed`, state then you
-   should be all set.
+   If all of the pods shown are in a `Running` or `Completed` state then you should be all set.
 
 Continue on to [exercise 4](../exercise-4/README.md).

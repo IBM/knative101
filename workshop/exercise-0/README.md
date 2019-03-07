@@ -3,7 +3,7 @@
 If you already have an IBM Cloud account with the following tools installed, you can skip these steps:
 
 - `ibmcloud` CLI for interacting with IBM Cloud
-- `ibmcloud ks` plugin IBM Kubernetes Service
+- `ibmcloud ks` plugin for IBM Kubernetes Service
 - `ibmcloud cr` plugin for IBM Container Registry
 - `kubectl` CLI for interacting with Kubernetes
 - `knctl` CLI for interacting with Knative
@@ -13,8 +13,7 @@ If you already have an IBM Cloud account with the following tools installed, you
 
 ### Installing the IBM Cloud developer tools and plugins
 
-1. Download and install the `ibmcloud` command line tool:
-    https://cloud.ibm.com/docs/cli/index.html#overview
+1. Download and install the `ibmcloud` [command line tool.](https://cloud.ibm.com/docs/cli/index.html#overview)
 
 1. Install the `ks` (kubernetes-service) plugin:
 

@@ -42,7 +42,7 @@ A Knative BuildTemplate encapsulates a shareable build process with some limited
 
 ### Deploy the Fibonacci App Using kubectl and service.yaml
 
-1. Edit the `service.yaml` file to point to your own container registry namespace by replacing instances of <NAMESPACE> with the container registry namespace you created earlier.
+1. Edit the `service.yaml` file to point to your own container registry namespace by replacing instances of `<NAMESPACE>` with the container registry namespace you created earlier.
 
 2. Apply the `service.yaml` file to your cluster.
 

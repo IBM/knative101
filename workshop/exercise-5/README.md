@@ -1,78 +1,73 @@
-## Update domain configuration for Knative
-When a Knative application is deployed, Knative will define a URL for your application. By default, Knative Serving routes use `example.com` as the default domain. The fully qualified domain name for a route by default is `{route}.{namespace}.{default-domain}`, where `{route}` is the name of the application to deploy.
+## Build and Deploy our Knative Application
 
-Because we want our application to be accessible at a URL we own, we need to configure Knative to assign new applications to our own domain.
+We've seen how to deploy an application from a container that already exists, so let's build the container image ourselves from source code. Using the Build & Serving components of Knative, we can build the image and push it to a private container registry on IBM Cloud, and then ultimately get a URL to access our application.
 
-### Get the Ingress Subdomain for your IBM Kubernetes Cluster
-What hostname should we use? Luckily for us, IBM Kubernetes Service gave us an external domain when we created our cluster. We'll first get that URL, tell Knative to assign new applications to that URL, and then forward requests to our Ingress Subdomain to the Knative Istio Gateway.
+### Install Kaniko Build Template
 
-1. First, let's get the ingress subdomain for our cluster.
+As a part of this lab, we will use the kaniko build template for building source into a container image from a Dockerfile. Kaniko doesn't depend on a Docker engine and instead executes each command within the Dockerfile completely in userspace. This enables building container images in environments that can't easily or securely run a Docker engine, such as Kubernetes.
 
+A Knative BuildTemplate encapsulates a shareable build process with some limited parameterization capabilities.
+
+1. Install the kaniko build template to your cluster.
+
+    ```
+    kubectl apply --filename https://raw.githubusercontent.com/knative/build-templates/master/kaniko/kaniko.yaml
+    ```
+
+2. Use kubectl to confirm you installed the kaniko build template, as well as to see some more details about it.  You'll see that this build template accepts parameters of `IMAGE` and `DOCKERFILE`.  `IMAGE` is the name of the image you will push to the container registry, and `DOCKERFILE` is the path to the Dockerfile that will be built.
+
+	Command:
 	```
-	ibmcloud ks cluster-get <my-cluster-name>
+	kubectl get BuildTemplate kaniko -o yaml
 	```
 
 	Example Output:
-	```
-	Ingress Subdomain:      mycluster6.us-south.containers.appdomain.cloud   
-	```
-	Ingress is a Kubernetes service that balances network traffic workloads in your cluster by forwarding public or private requests to your apps. This Ingress Subdomain is an externally available and public URL providing access to your cluster. Take note of this Ingress Subdomain.
-
-2. Next, update the default URL for new Knative apps by editing the configuration:
-
-	```
-	kubectl edit cm config-domain --namespace knative-serving
-	```
-
-3. Change all instances of `example.com` to your ingress subdomain, which should look something like: `mycluster6.us-south.containers.appdomain.cloud`. There should be one instance of `example.com` under `data`. New Knative applications will now be assigned a route with this host, rather than `example.com`. Save the file and exit.
-
-4. Export the `Ingress Subdomain` as an environment variable for use later on in the lab.
-
-    ```shell
-    export MYINGRESS=<your_ingress_subdomain>
-    ```
-
-### Forward specific requests coming into IKS ingress to the Knative Ingress Gateway
-
-1. When requests come in to our fibonacci application through the ingress subdomain, we want them to be forwarded to the Knative ingress gateway. Edit the `forward-ingress.yaml` file with your own ingress subdomain, prepended with `fib-knative.default`. Remember that the fully qualified domain name for a route has the following form: `{route}.{namespace}.{domain}`.
-
-The file should look something like:
-
-```yaml
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: iks-knative-ingress
-  namespace: istio-system
-spec:
-  rules:
-    - host: fib-knative.default.<ingress_subdomain>
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: istio-ingressgateway
-              servicePort: 80
-```
-
-2. Apply the ingress rule.
-
-	```
-	kubectl apply --filename forward-ingress.yaml
+	```yaml
+      spec:
+        generation: 1
+        parameters:
+        - description: The name of the image to push
+          name: IMAGE
+        - default: /workspace/Dockerfile
+          description: Path to the Dockerfile to build.
+          name: DOCKERFILE
+        steps:
+        - args:
+          - --dockerfile=${DOCKERFILE}
+          - --destination=${IMAGE}
+          image: gcr.io/kaniko-project/executor
+          name: build-and-push
 	```
 
-### Try it again
 
-Now that we've setup our DNS routing, let's try our `curl` command again
-using the DNS hostname:
+### Deploy the Fibonacci App Using kubectl and service.yaml
 
-```
-curl fib-knative.default.$MYINGRESS/5
-```
+1. Edit the `service.yaml` file to point to your own container registry namespace by replacing instances of `<NAMESPACE>` with the container registry namespace you created earlier.
 
-Expected Output:
-```
-[1,1,2,3,5]
-```
+2. Apply the `service.yaml` file to your cluster.
+
+	```
+	kubectl apply -f service.yaml
+	```
+3. Run `kubectl get pods --watch` to see the pods initializing. Note: To exit the watch, use `ctrl + c`.
+
+4. Take a look at the `service.yaml` file again. The service.yaml file defines the required Knative components to build the application from source code in the git repository and push the built container image to the private container registry. Then it'll replace the currently running version of the application with this new one.
+
+5. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the domain that was provided to us.
+
+	```
+	curl $MY_DOMAIN/20
+	```
+6. You should see the first 20 Fibonacci numbers!
+
+7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state. Note: To exit the watch, use `ctrl + c`.
+
+	Expected Output:
+	```
+	NAME                                            READY   STATUS      RESTARTS   AGE
+	fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
+	fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
+	fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
+	```
 
 Continue on to [exercise 6](../exercise-6/README.md).

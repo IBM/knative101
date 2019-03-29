@@ -2,7 +2,7 @@
 Knative Serving supports deploying and serving of serverless applications and functions. Those applications and functions will automatically scale up, and then back down to zero. In this exercise, we'll use the Knative Serving component to deploy our first application from a container image hosted on dockerhub.
 
 ### Create a Service Definition
-Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
+Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/docs/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
 
 Because Knative is built on top of Kubernetes, you can use kubectl along with a service definition file to create a new Service definition for your application.
 
@@ -44,22 +44,22 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with a 
 
     Note: To exit the watch, use `ctrl + c`.
 
-4. Let's try out our new application! First, we'll need to know the external IP for our service. Run the following command, and note the value for `EXTERNAL-IP`.
-
-    ```
-    kubectl get svc istio-ingressgateway --namespace istio-system
-    ```
-
-5. We will also need to know the domain name that Knative assigned to the Service we just deployed. Run the following command, and note the value for `domain`.
+4. Let's try out our new application! First, let's get the domain name that Knative assigned to the Service we just deployed. Run the following command, and note the value for `domain`. IBM Cloud Kubernetes Service sets the default domain name for Knative to match the domain name of your IBM Cloud Kubernetes Service cluster. It will also set up the Istio ingress to route all incoming requests targeted to that domain to Knative.
 
     ```
     kubectl get ksvc fib-knative
     ```
 
-6. You'll notice that the domain name is `fib-service.default.example.com`, but we don't actually own anything at `example.com`. We'll see how to update this to our own domain name later, but for now we can directly curl the external IP address for our cluster, and pass in a Host header. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
+5. The domain name should look something like `fib-knative.default.bmv-kubeflow.us-south.containers.appdomain.cloud`. We can set an environment variable so that we can use this throughout the lab:
 
     ```
-     curl -H 'Host: fib-knative.default.example.com' {EXTERNAL_IP}/5
+    export MY_DOMAIN=<your_app_domain_here>
+    ```
+
+6. We can now curl this domain to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
+
+    ```
+     curl $MY_DOMAIN/5
     ```
 
     Expected Output:

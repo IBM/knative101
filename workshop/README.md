@@ -10,7 +10,7 @@ Two of the key Knative personas are Developers and platform providers. Developer
 
 ![knative personas](README_images/audience.png)
 
-The Knative application you'll create is a fibonacci sequence app. When provided with the number n, it will return the first n numbers of the fibonacci sequence: 1, 1, 2, 3.... You'll also deploy a vnext of the application, which starts the fibonacci sequence with 0 instead of 1: 0, 1, 1, 2, 3.... The application will be given a domain from Knative, which you'll configure to be the same host as your IKS ingress subdomain. You will then forward incoming requests from that IKS cluster subdomain to the Knative gateway, which will then route requests to your application.
+The Knative application you'll create is a fibonacci sequence app. When provided with the number n, it will return the first n numbers of the fibonacci sequence: 1, 1, 2, 3.... You'll also deploy a vnext of the application, which starts the fibonacci sequence with 0 instead of 1: 0, 1, 1, 2, 3.... The application will be given a domain, which you'll be able to curl to get the fibonacci results.
 
 You'll learn to deploy applications using kubectl with a configuration yaml file, as well as to deploy applications using the knctl tool. You'll be able to see your application scale up when in use, and then scale back down to zero pods when it's not being used.
 

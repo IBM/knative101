@@ -1,10 +1,27 @@
-## Deploy Our First Knative Application
-Knative Serving supports deploying and serving of serverless applications and functions. Those applications and functions will automatically scale up, and then back down to zero. In this exercise, we'll use the Knative Serving component to deploy our first application from a container image hosted on dockerhub.
+## Clone the Application Repo and Deploy our Application using Kubectl and yaml
 
-### Create a Service Definition
+### Clone the application repo
+Let's get the code we'll use for today's lab. This repository contains the code for the Fibonacci application as well as various .yaml files we'll use throughout the lab.
+
+1. Clone the git repository:
+
+    ```
+    git clone https://github.com/IBM/fib-knative.git
+    ```
+
+2. Change directories to the fib-knative folder.
+
+    ```
+    cd fib-knative
+    ```
+
+## Deploy Our Application using kubectl and yaml
+In this exercise, we'll use the Knative Serving component to deploy our application from a container image hosted on dockerhub. Instead of using the `kn` cli, we'll use `kubectl` and `.yaml` files. This should feel familiar if you're a kubernetes user.
+
+### Create the Configuration and Route for our Service
 Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/docs/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
 
-Because Knative is built on top of Kubernetes, you can use kubectl along with a service definition file to create a new Service definition for your application.
+Because Knative is built on top of Kubernetes, you can use kubectl along with configuration files to create a new Service representing your application.
 
 1. In the `fib-knative` project you cloned earlier, you should see a file called `fib-service.yaml`. Look at the contents of the file:
 
@@ -17,19 +34,20 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with a 
     apiVersion: serving.knative.dev/v1alpha1
     kind: Service
     metadata:
-      name: fib-knative
-      namespace: default
+        name: fib-knative
+        namespace: default
     spec:
-      runLatest:
-        configuration:
-          revisionTemplate:
-            spec:
-              container:
-                image: docker.io/ibmcom/fib-knative
+        release:
+            revisions: ["@latest"]
+            configuration:
+            revisionTemplate:
+                spec:
+                    container:
+                        image: docker.io/ibmcom/fib-knative
     ```
 
-    The `fib-service.yaml` file describes a Service. Notice that it includes the name (fib-knative), the namespace (default), and a reference to the container image on dockerhub (docker.io/ibmcom/fib-knative).
-
+    The `fib-service.yaml` file describes a Service. Notice that it includes the name (fib-knative), the namespace (default), and a reference to the container image on dockerhub (docker.io/ibmcom/fib-knative). 
+    
 2. Let's deploy this app into our cluster. Apply the `fib-service.yaml` file.
 
     ```
@@ -44,22 +62,18 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with a 
 
     Note: To exit the watch, use `ctrl + c`.
 
-4. Let's try out our new application! First, let's get the domain name that Knative assigned to the Service we just deployed. Run the following command, and note the value for `domain`. IBM Cloud Kubernetes Service sets the default domain name for Knative to match the domain name of your IBM Cloud Kubernetes Service cluster. It will also set up the Istio ingress to route all incoming requests targeted to that domain to Knative.
+4. Let's try out our application again! Because the service name was the same as the application you deployed before, `fib-knative`, the domain name for our service should be the same. You can double check if you want.
 
     ```
-    kubectl get ksvc fib-knative
+    kn service get fib-knative
     ```
 
-5. The domain name should look something like `fib-knative.default.bmv-kubeflow.us-south.containers.appdomain.cloud`. We can set an environment variable so that we can use this throughout the lab:
-
-    ```
-    export MY_DOMAIN=<your_app_domain_here>
-    ```
+5. The domain name should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`.
 
 6. We can now curl this domain to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
 
     ```
-     curl $MY_DOMAIN/5
+    curl $MY_DOMAIN/5
     ```
 
     Expected Output:
@@ -67,7 +81,7 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with a 
     [1,1,2,3,5]
     ```
 
-7. Congratulations! You've got your first Knative application deployed and responding to requests. Try sending some different number requests. If you stop making requests to the application, you should eventually see that your application scales itself back down to zero. Watch the pod until you see that it is `Terminating`. This should take approximately 90 seconds.
+7. Congratulations! You've got your Knative application deployed and responding to requests again, but this time you deployed with `kubectl` and `.yaml` files. Try sending some different number requests. If you stop making requests to the application, you should eventually see that your application scales itself back down to zero. Watch the pod until you see that it is `Terminating`. This should take approximately 90 seconds.
 
     ```
     kubectl get pods --watch

@@ -6,7 +6,7 @@ If you already have an IBM Cloud account with the following tools installed, you
 - `ibmcloud ks` plugin for IBM Kubernetes Service
 - `ibmcloud cr` plugin for IBM Container Registry
 - `kubectl` CLI for interacting with Kubernetes
-- `knctl` CLI for interacting with Knative
+- `kn` CLI for interacting with Knative
 
 ### Create an IBM Cloud Account
 1. Create an account on [IBM Cloud](https://cloud.ibm.com/registration).
@@ -36,18 +36,14 @@ The Kubernetes command-line tool, kubectl, can be used to deploy and manage appl
 
 1. Install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl)
 
-### Install knctl CLI
-The Knative command-line tool, knctl provides a set of commands to interact with a Knative installation. Let's install knctl as well.
+### Install kn CLI
+The Knative command-line tool, kn provides a set of commands to interact with a Knative installation. Let's install kn as well.
 
-1. Install knctl using one of the prebuilt binaries from their [release page](https://github.com/cppforlife/knctl/releases), and run the following commands:
+1. Install the kn client by following their [instructions for installation](https://github.com/knative/client/blob/master/docs/README.md#installing-kn). You should be able to download the latest binary executable, and add it to your path, and ensure the file is executable. To ensure the file is executable, run the following command:
 
     ```
-    shasum -a 256 ~/Downloads/knctl-*
-    # Compare checksum output to what's included in the release notes
-
-    mv ~/Downloads/knctl-* /usr/local/bin/knctl
-
-    chmod +x /usr/local/bin/knctl
+    chmod +x kn
     ```
+
 
 Continue on to [exercise 1](../exercise-1/README.md).

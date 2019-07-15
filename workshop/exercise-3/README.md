@@ -28,7 +28,7 @@ We've already created an image on dockerhub that contains the first version of o
 3. Let's try out our new application! First, let's get the domain name that Knative assigned to the Service we just deployed. Run the following command, and note the value for `domain`. IBM Cloud Kubernetes Service sets the default domain name for Knative to match the domain name of your IBM Cloud Kubernetes Service cluster.
 
     ```
-    kn service get fib-knative
+    kn service describe fib-knative
     ```
 
 4. The domain name should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`. We can set an environment variable so that we can use this throughout the lab:

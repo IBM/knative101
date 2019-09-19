@@ -34,20 +34,20 @@ This lab will need credentials for authenticating to your private container regi
 
 A `Secret` is a Kubernetes object containing sensitive data such as a password, a token, or a key. You can also read more about [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/).
 
-1. Let's create a secret, which will be a `docker-registry` type secret. This type of secret is used to authenticate with a container registry to pull down a private image. We can create this via the commandline. For username, simply use the string `iamapikey`. For `<token_value>`, use the token you made note of earlier.
+1. Let's create a secret, which will be a `docker-registry` type secret. This type of secret is used to authenticate with a container registry to pull down a private image. We can create this via the commandline. For username, simply use the string `iamapikey`. For `<api_key_value>`, use the api key you made note of earlier.
 
     ```
-    kubectl create secret docker-registry ibm-cr-secret --docker-server=https://us.icr.io --docker-username=iamapikey --docker-password=$MYAPIKEY
+    kubectl --namespace default create secret docker-registry ibm-cr-secret  --docker-server=us.icr.io --docker-username=iamapikey --docker-password=$MYAPIKEY
     ```
 
-2. We will also need a secret for the build process to have credentials to push the built image to the container registry. To create this object, we'll first need to base64 encode our username and password for IBM Container Registry. For username, you will again use the string `iamapikey`. The base64 encoding of `token` should be: `aWFtYXBpa2V5` - which is already in the yaml file.  Let's base64 encode our token, and copy it.
+2. We will also need a secret for the build process to have credentials to push the built image to the container registry. To create this secret, we'll first need to base64 encode our username and password for IBM Container Registry. For username, you will use the string `iamapikey`. The base64 encoding of `iamapikey` should be: `aWFtYXBpa2V5` - which is already in the yaml file.  Let's base64 encode our apikey, and copy it.
 
     ```
-    echo -n "$MYTOKEN" | base64 -w0  # Linux
-    echo -n "$MYTOKEN" | base64 -b0  # MacOS
+    echo -n "$MYAPIKEY" | base64 -w0  # Linux
+    echo -n "$MYAPIKEY" | base64 -b0  # MacOS
     ```
 
-3. Update the `docker-secret.yaml` file with your base64 encoded password. You can find the password field near the end of the file. Username (`dG9rZW4=`) is already provided for you.  Replace `<base_64_encoded_token_value>` with your own base64 encoded token value, and ensure you've saved the file.
+3. Update the `docker-secret.yaml` file with your base64 encoded password. You can find the password field near the end of the file. Username (`aWFtYXBpa2V5=`) is already provided for you.  Replace `<base_64_encoded_api_key_value>` with your own base64 encoded apikey value, and ensure you've saved the file.
 
 4. Apply the secret to your cluster:
 

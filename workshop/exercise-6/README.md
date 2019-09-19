@@ -11,7 +11,7 @@ In the previous exercises, we deployed a container to Knative directly from dock
     When prompted, select your own account, and then enter the number for the region `us-south`.
 
 
-1. Add a namespace to your account. You must set at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can set up multiple namespaces as well as control access to your namespaces by using IAM policies.
+1. Add a namespace to your account. You must create at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can create multiple namespaces as well as control access to your namespaces by using IAM policies.
 
     ```
     ibmcloud cr namespace-add <my_namespace>

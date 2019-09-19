@@ -80,7 +80,7 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
     kubectl apply --filename service-account.yaml
     ```
 
-Congratulations! You've set up some required credentials that the Tekton pipeline process will use to have access to push to your container registry. In the next exercise, you will build the image, push it to your container registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
+Congratulations! You've set up some required credentials that the Tekton pipeline process will use to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
 
 
 Continue on to [exercise 7](../exercise-7/README.md).

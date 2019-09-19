@@ -1,6 +1,6 @@
 ## (OPTIONAL, FOR ADVANCED USERS) Build and Deploy our Knative Application
 
-We've seen how to deploy an application from a container that already exists, so let's build the container image ourselves from source code. We'll be using Tekton Pipelines, a project providing Kubernetes-style resources for declaring CI/CD pipelines. We'll fetch our source code from a github repository, build a container image from it, push it to a private container registry on IBM Cloud, and then ultimately get a URL to access our application.
+We've seen how to deploy an application from an image that already exists, so let's build the image ourselves from source code. We'll be using Tekton Pipelines, a project providing Kubernetes-style resources for declaring CI/CD pipelines. We'll fetch our source code from a github repository, build a container image from it, push it to a private container image registry on IBM Cloud, and then ultimately get a URL to access our application.
 
 ### Tekton Components Overview
 
@@ -49,7 +49,7 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
     ```
     This file defines the location where our built image will be stored. In our case, we'll be storing it on the IBM Cloud Container Registry. 
 
-4. Make sure you update the image value with your own container registry namespace, which you defined in exercise 6.
+4. Make sure you update the image value with your own container registry namespace, which you defined in exercise 6. Replace <NAMESPACE> with your own namespace.
 
 5. Apply this yaml file to your kubernetes cluster.
     ```

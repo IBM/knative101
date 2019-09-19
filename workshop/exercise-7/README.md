@@ -4,7 +4,7 @@ We've seen how to deploy an application from a container that already exists, so
 
 ### Tekton Components Overview
 
-First, let's understand a few of the Tekton components we will be using in this exercise. A `Task` defines work that needs to be executed, and are made up of a series of `steps` that the task will execute sequentially.
+First, let's understand a few of the Tekton components we will be using in this exercise. A `Task` defines work that needs to be executed, and is made up of a series of `steps` that will be executed sequentially.
 
 A `TaskRun` will run the `Task` that you defined. You can then view output from the `TaskRun`.
 
@@ -49,7 +49,7 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
     ```
     This file defines the location where our built image will be stored. In our case, we'll be storing it on the IBM Cloud Container Registry. 
 
-4. Make sure you update the file with your own namespace, which you defined in exercise 6.
+4. Make sure you update the image value with your own container registry namespace, which you defined in exercise 6.
 
 5. Apply this yaml file to your kubernetes cluster.
     ```

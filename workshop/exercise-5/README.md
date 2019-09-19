@@ -63,6 +63,4 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
 6. We should see that the curl requests are routed approximately 90/10 between the two revisions. Let's kill this process using `ctrl + c`.
 
 
-Congratulations! You've completed the lab!  If you have tons of time left over, and are interested in diving deeper, we've included 2 advanced exercises you could complete.
-
-Continue on to [exercise 6](../exercise-6/README.md).
+Congratulations! You've completed the lab! You've deployed a new version of fib-knative, and updated the rollout percentage of your application.

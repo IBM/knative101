@@ -65,7 +65,7 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with co
 4. Let's try out our application again! Because the service name was the same as the application you deployed before, `fib-knative`, the domain name for our service should be the same. You can double check if you want.
 
     ```
-    kn service get fib-knative
+    kn service describe fib-knative
     ```
 
 5. The domain name should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`.

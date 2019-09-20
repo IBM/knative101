@@ -58,7 +58,7 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 
 ### Build Image From Source and Push to Container Registry
 
-1. Take a look at the `image_from_source_task.yaml` file. This `Task` has inputs and outputs. The input resource is the github repository we just defined, and the output is the image that will be produced from that source. You'll notice that the build-and-push step of this `Task` uses Kaniko to build the source into a container image from a Dockerfile. Kaniko doesn't depend on a Docker engine and instead executes each command within the Dockerfile completely in userspace. This enables building container images in environments that can't easily or securely run a Docker engine, such as Kubernetes.
+1. Take a look at the `image-from-source-task.yaml` file. This `Task` has inputs and outputs. The input resource is the github repository we just defined, and the output is the image that will be produced from that source. You'll notice that the build-and-push step of this `Task` uses Kaniko to build the source into a container image from a Dockerfile. Kaniko doesn't depend on a Docker engine and instead executes each command within the Dockerfile completely in userspace. This enables building container images in environments that can't easily or securely run a Docker engine, such as Kubernetes.
 
     ```
     apiVersion: tekton.dev/v1alpha1
@@ -102,10 +102,10 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 
 2. Apply this yaml file to your kubernetes cluster.
     ```
-    kubectl apply -f image_from_source_task.yaml
+    kubectl apply -f image-from-source-task.yaml
     ```
   
-3. Now that our `Task` is defined, let's define a `TaskRun` that will run the `Task`. This `TaskRun` will bind inputs and outputs to our earlier defined resources, `fib-knative` and `fib-knative-git`. This `TaskRun` will also execute the `steps` we defined for our `Task`. Take a look at this file, called `image_from_source_task_run.yaml`.
+3. Now that our `Task` is defined, let's define a `TaskRun` that will run the `Task`. This `TaskRun` will bind inputs and outputs to our earlier defined resources, `fib-knative` and `fib-knative-git`. This `TaskRun` will also execute the `steps` we defined for our `Task`. Take a look at this file, called `image-from-source-task-run.yaml`.
 
     ```
     apiVersion: tekton.dev/v1alpha1
@@ -135,7 +135,7 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 
 4. Apply this yaml file to your kubernetes cluster.
     ```
-    kubectl apply -f image_from_source_task_run.yaml
+    kubectl apply -f image-from-source-task-run.yaml
     ```
 
 5. To see the output of the `TaskRun`, you can use the following command:
@@ -166,7 +166,7 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 5. This application has a different name, and will have a different domain. Let's get that URL now.
 
   ```
-  kn service get fib-knative-built
+  kn service describe fib-knative-built
   ```
 
 6. The route should begin with `fib-knative-built`, and look something like `fib-knative-built-default.bmv-knative-lab.us-south.containers.appdomain.cloud`. Save that in an environment variable now:

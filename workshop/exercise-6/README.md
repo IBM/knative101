@@ -43,8 +43,8 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 2. We will also need a secret for the build process to have credentials to push the built image to the container registry. To create this secret, we'll first need to base64 encode our username and password for IBM Container Registry. For username, you will use the string `iamapikey`. The base64 encoding of `iamapikey` should be: `aWFtYXBpa2V5` - which is already in the yaml file.  Let's base64 encode our apikey, and copy it.
 
     ```
-    echo -n "$MYAPIKEY" | base64 -w0  # Linux
-    echo -n "$MYAPIKEY" | base64 -b0  # MacOS
+    echo -n $MYAPIKEY | base64 -w0  # Linux
+    echo -n $MYAPIKEY | base64 -b0  # MacOS
     ```
 
 3. Update the `docker-secret.yaml` file with your base64 encoded password. You can find the password field near the end of the file. Username (`aWFtYXBpa2V5=`) is already provided for you.  Replace `<base_64_encoded_api_key_value>` with your own base64 encoded apikey value, and ensure you've saved the file.

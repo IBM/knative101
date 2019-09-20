@@ -184,9 +184,9 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 
 Expected Output:
 
-    ```
-    NAME                                            READY   STATUS      RESTARTS   AGE
-    fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
-    fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
-    fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
-    ```
+  ```
+  NAME                                            READY   STATUS      RESTARTS   AGE
+  fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
+  fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
+  fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
+  ```

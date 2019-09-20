@@ -151,42 +151,41 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 
 2. Apply the `service.yaml` file to your cluster.
     ```
-    kubectl apply -f service.yaml
-    ```
+     kubectl apply -f service.yaml
+    ```
 
 3. Run `kubectl get pods --watch` to see the pods initializing. Note: To exit the watch, use `ctrl + c`.
 
 4. Take a look at the `service.yaml` file again:
     ```
-    cat service.yaml
-    ```
+    cat service.yaml
+    ```
+
   You should see values for the serviceAccount that you created earlier, as well as the image that we're deploying to knative. This is the image you just built using Tekton.
 
 5. This application has a different name, and will have a different domain. Let's get that URL now.
-
-    ```
-    kn service describe fib-knative-built
-    ```
+    ```
+    kn service describe fib-knative-built
+    ```
 
 6. The route should begin with `fib-knative-built`, and look something like `fib-knative-built-default.bmv-knative-lab.us-south.containers.appdomain.cloud`. Save that in an environment variable now:
-
-    ```
-    export MY_BUILT_DOMAIN=fib-knative-built....
-    ```
+    ```
+    export MY_BUILT_DOMAIN=fib-knative-built....
+    ```
 
 7. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us. Ensure you've updated the command with your own ingress subdomain.
+    ```
+    curl $MY_BUILT_DOMAIN/20
+    ```
 
-    ```
-    curl $MY_BUILT_DOMAIN/20
-    ```
 6. You should see the first 20 Fibonacci numbers!
 
 7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state. Note: To exit the watch, use `ctrl + c`.
 
     Expected Output:
-    ```
-    NAME                                            READY   STATUS      RESTARTS   AGE
-    fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
-    fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
-    fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
-    ```
+    ```
+    NAME                                            READY   STATUS      RESTARTS   AGE
+    fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
+    fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
+    fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
+    ```

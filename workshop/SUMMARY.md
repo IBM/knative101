@@ -4,3 +4,5 @@
 * [Deploy our First Application to Knative using the Knative Client](exercise-3/README.md)
 * [Clone the Application Repo and Deploy our Application using Kubectl and yaml](exercise-4/README.md)
 * [Deploy vnext Version and Apply Traffic Shifting](exercise-5/README.md)
+* [Set up a Private Container Image Registry and Obtain Credentials](exercise-6/README.md)
+* [Build and Deploy our Knative Application](exercise-7/README.md)

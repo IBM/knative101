@@ -1,4 +1,4 @@
-## (OPTIONAL, FOR ADVANCED USERS) Set up a Private Container Registry and Obtain Credentials
+## (OPTIONAL, FOR ADVANCED USERS) Set up a Private Container Image Registry and Obtain Credentials
 
 In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://console.bluemix.net/docs/services/Registry/registry_overview.html#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
 

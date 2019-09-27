@@ -2,9 +2,11 @@
 
 In this lab, you'll learn about Knative, a new open source collaboration from IBM, Google, Pivotal, Red Hat, Cisco, and others. You'll create a new cluster on IBM Kubernetes Service (IKS), install Istio & Knative to that cluster, and then deploy a Node.js fibonacci application to Knative.
 
-Knative is built on top of Istio & Kubernetes, and is a set of primitives for enabling serverless applications on Kubernetes.  Knative is made up of 3 components: Serving, Build, and Eventing.
+Knative is built on top of Istio & Kubernetes, and is a set of primitives for enabling serverless applications on Kubernetes. Knative consists of the Serving and Eventing components. 
 
-Serving supports serving your applications, managing traffic, as well as routing and autoscaling.  Build supports creating a set of steps to build your application from source code to containers, on cluster.  Eventing enables you to create event producers and consumers for your application.
+Serving supports serving your applications, managing traffic, as well as routing and autoscaling. Eventing enables you to create event producers and consumers for your application.
+
+We will also explore Tekton Pipelines, a project providing kubernetes-style resources for declaring CI/CD pipelines.
 
 Two of the key Knative personas are Developers and platform providers. Developers can use Knative directly (or through an API) to build Serverless applications on top of Kubernetes.  Platform providers can use the Knative primitives to build their own Serverless platform on Kubernetes.
 

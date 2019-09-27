@@ -1,4 +1,3 @@
 language: script
 
-script:
-- ./.verify-links.sh -v
+script: bash ./.verify-links.sh -v

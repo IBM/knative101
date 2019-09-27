@@ -1,5 +1,3 @@
 language: script
 
-script:
-- bash -n $(find . -name *.sh)
-- ./.verify-links.sh -v
+script: bash ./.verify-links.sh -v

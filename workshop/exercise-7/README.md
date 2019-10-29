@@ -182,11 +182,13 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 
 7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state. Note: To exit the watch, use `ctrl + c`.
 
-Expected Output:
+    Expected Output:
 
-  ```
-  NAME                                            READY   STATUS      RESTARTS   AGE
-  fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
-  fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
-  fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
-  ```
+      ```
+      NAME                                            READY   STATUS      RESTARTS   AGE
+      fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
+      fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
+      fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
+      ```
+
+Congratulations! You've completed the Knative 101 lab. You should feel that you got a quick overview of deploying applications to Knative, using Tekton Pipelines, and seeing some of the benefits of Knative. If you're interested in diving a little deeper, check out the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.

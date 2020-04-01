@@ -31,17 +31,10 @@ Set the context for your cluster in your CLI. Every time you log in to the CLI t
 1. Download the configuration file and certificates for your cluster using the `cluster-config` command.
 
     ```shell
-    ibmcloud ks cluster-config $MYCLUSTER
+    ibmcloud ks cluster config --cluster $MYCLUSTER
     ```
 
-2. Copy and paste the output command from the previous step to set the `KUBECONFIG` environment variable and configure your CLI to run `kubectl` commands against your cluster.
-
-    Example:
-    ```shell
-    export KUBECONFIG=/Users...
-    ```
-
-3. Validate access to your cluster by viewing the nodes in the cluster.
+2. Validate access to your cluster by viewing the nodes in the cluster.
 
     ```shell
     kubectl get node

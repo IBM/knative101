@@ -52,7 +52,7 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
 5. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called.
 
 	```
-	while sleep 0.5; do curl "$MY_DOMAIN/1"; done
+	while sleep 0.5; do curl "$MY_APP_URL/1"; done
 	```
 
     Expected Output:

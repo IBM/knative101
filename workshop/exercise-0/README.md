@@ -39,7 +39,7 @@ The Kubernetes command-line tool, kubectl, can be used to deploy and manage appl
 ### Install kn CLI
 The Knative command-line tool, kn provides a set of commands to interact with a Knative installation. Let's install kn as well.
 
-1. Install the kn client by following their [instructions for installation](https://github.com/knative/client/blob/master/docs/README.md#installing-kn). You should be able to download the latest binary executable, and add it to your path, and ensure the file is executable. To ensure the file is executable, run the following command:
+1. Install the kn client by following the [instructions for installation](https://knative.dev/docs/install/install-kn/). You should be able to download the latest binary executable, add it to your path, and ensure the file is executable. To ensure the file is executable, run the following command:
 
     ```
     chmod +x kn

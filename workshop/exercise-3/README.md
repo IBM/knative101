@@ -1,5 +1,5 @@
 ## Deploy our First Application to Knative using the Knative Client (kn)
-A relatively new project, the knative client aims to make interacting with Knative a seamless experience for developers. We'll try deploying an application using `kn`, then we'll deploy the same application using `kubectl` and `.yaml` files for additional control. The application for this lab is a simple node.js with express app which returns the first n numbers of the Fibonacci sequence. Once the app is deployed, you can use it by making a GET request to the `/` endpoint with a number as the parameter. 
+The knative client aims to make interacting with Knative a seamless experience for developers. We'll try deploying an application using `kn`, then we'll deploy the same application using `kubectl` and `.yaml` files for additional control. The application for this lab is a simple Node.js with Express app which returns the first n numbers of the Fibonacci sequence. Once the app is deployed, you can use it by making a GET request to the `/` endpoint with a number as the parameter. 
 
 # Our First Knative Service
 Knative Serving supports deploying and serving of serverless applications. Those applications will automatically scale up, and then back down to zero. In this exercise, we'll use the Knative Serving component to deploy our first application from a container image hosted on dockerhub. 
@@ -17,29 +17,22 @@ We've already created an image on dockerhub that contains the first version of o
     kn service create --image docker.io/ibmcom/fib-knative fib-knative
     ```
 
-2. Watch the pods initializing as our application gets deployed and starts up:
+2. You should see some output indicating that the service was created. You should also be given the URL where your application will be available. It should look something like `htpp://fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`. You should see your cluster name as a  part of the URL, since IBM Cloud Kubernetes Service sets the default domain name for Knative to match the domain name of your cluster.
 
-    ```
-    kubectl get pods --watch
-    ```
-
-    Note: To exit the watch, use `ctrl + c`.
-
-3. Let's try out our new application! First, let's get the domain name that Knative assigned to the Service we just deployed. Run the following command, and note the value for `domain`. IBM Cloud Kubernetes Service sets the default domain name for Knative to match the domain name of your IBM Cloud Kubernetes Service cluster.
-
+3. Let's try out our application! First, we can set an environment variable for the URL, so that we can use it throughout the lab. If you need to access this URL again later, as well as other information about your serivce you can use the `kn service describe` command:
+    
     ```
     kn service describe fib-knative
     ```
 
-4. The domain name should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`. We can set an environment variable so that we can use this throughout the lab:
+    ```
+    export MY_APP_URL=<your_application_url_here>
+    ```
+
+4. We can now curl this domain to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
 
     ```
-    export MY_DOMAIN=<your_app_domain_here>
-    ```
-5. We can now curl this domain to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
-
-    ```
-    curl $MY_DOMAIN/5
+    curl $MY_APP_URL/5
     ```
 
     Expected Output:
@@ -47,7 +40,7 @@ We've already created an image on dockerhub that contains the first version of o
     [1,1,2,3,5]
     ```
 
-6. Congratulations! You've got your first Knative application deployed and responding to requests. Try sending some different number requests. If you stop making requests to the application, you should eventually see that your application scales itself back down to zero. Watch the pod until you see that it is `Terminating`. This should take approximately 90 seconds.
+5. Congratulations! You've got your first Knative application deployed and responding to requests. Try sending some different number requests. If you stop making requests to the application, you should eventually see that your application scales itself back down to zero. Watch the pods until you see that it is `Terminating`. This should take approximately 90 seconds.
 
     ```
     kubectl get pods --watch
@@ -55,7 +48,7 @@ We've already created an image on dockerhub that contains the first version of o
 
     Note: To exit the watch, use `ctrl + c`.
 
-7. We'll redeploy this same application in a different way in the next exercise, so let's clean up.
+6. We'll redeploy this same application in a different way in the next exercise, so let's clean up.
 
     ```
     kn service delete fib-knative

@@ -19,7 +19,7 @@ automatically.
 2. Next ask for Knative to be installed:
 
     ```
-	ibmcloud ks cluster-addon-enable knative --cluster $MYCLUSTER
+	ibmcloud ks cluster addon enable knative --cluster $MYCLUSTER
 	```
 
     You will be prompted to install Istio - when you see this prompt, enter `y`.
@@ -35,18 +35,19 @@ automatically.
    and you should see something like:
 
    ```
-   NAME                 STATUS   AGE
-   default              Active   7d18h
-   ibm-cert-store       Active   7d18h
-   ibm-system           Active   7d18h
-   istio-system         Active   7d17h
-   knative-build        Active   7d17h
-   knative-eventing     Active   7d17h
-   knative-monitoring   Active   7d17h
-   knative-serving      Active   7d17h
-   knative-sources      Active   7d17h
-   kube-public          Active   7d18h
-   kube-system          Active   7d18h
+    NAME                 STATUS   AGE
+    default            Active   21h
+    ibm-cert-store     Active   21h
+    ibm-operators      Active   21h
+    ibm-system         Active   21h
+    istio-system       Active   8s
+    knative-eventing   Active   7s
+    knative-serving    Active   7s
+    knative-sources    Active   7s
+    kube-node-lease    Active   21h
+    kube-public        Active   21h
+    kube-system        Active   21h
+    tekton-pipelines   Active   7s
    ```
 
    Notice the `istio-system` namespace, and the `knative-...` namespaces.
@@ -57,11 +58,8 @@ automatically.
    ```
    kubectl get pods --namespace istio-system
    kubectl get pods --namespace knative-serving
-   kubectl get pods --namespace knative-build
+   kubectl get pods --namespace tekton-pipelines
    ```
-
-   You could check the pods in all of the Knative namespaces, but for this
-   workshop only "serving" and "build" are required.
    
 
    Example Ouput:

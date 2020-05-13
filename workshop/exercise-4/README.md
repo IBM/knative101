@@ -62,18 +62,18 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with co
 
     Note: To exit the watch, use `ctrl + c`.
 
-4. Let's try out our application again! Because the service name was the same as the application you deployed before, `fib-knative`, the domain name for our service should be the same. You can double check if you want.
+4. Let's try out our application again! Because the service name was the same as the application you deployed before, `fib-knative`, the URL for our service should be the same. You can double check if you want.
 
     ```
     kn service describe fib-knative
     ```
 
-5. The domain name should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`.
+5. The URL should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`.
 
-6. We can now curl this domain to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
+6. We can now curl this URL to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
 
     ```
-    curl $MY_DOMAIN/5
+    curl $MY_APP_URL/5
     ```
 
     Expected Output:

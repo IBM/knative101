@@ -1,6 +1,6 @@
 ## (OPTIONAL, FOR ADVANCED USERS) Set up a Private Container Image Registry and Obtain Credentials
 
-In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://console.bluemix.net/docs/services/Registry/registry_overview.html#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
+In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
 
 1. You will need to first create an IBM Container Registry namespace. Let's confirm you're logged in.
 
@@ -80,7 +80,7 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
     kubectl apply --filename service-account.yaml
     ```
 
-Congratulations! You've set up some required credentials that the Tekton pipeline process will use to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
+Congratulations! You've set up some required credentials that the Tekton Pipeline process will use to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
 
 
 Continue on to [exercise 7](../exercise-7/README.md).

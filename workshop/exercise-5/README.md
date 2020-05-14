@@ -11,43 +11,62 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
 
     Expected Output:
     ```
-    apiVersion: serving.knative.dev/v1alpha1
+    apiVersion: serving.knative.dev/v1
     kind: Service
     metadata:
-        name: fib-knative
-        namespace: default
+      name: fib-knative
+      namespace: default
     spec:
-        release:
-            revisions: ["fib-knative-xxxxx", "@latest"]
-            rolloutPercent: 10
-            configuration:
-                revisionTemplate:
-                    spec:
-                        container:
-                            image: docker.io/ibmcom/fib-knative:vnext
+      template:
+        metadata:
+          name: fib-knative-zero
+        spec:
+          containers:
+            - image: docker.io/ibmcom/fib-knative:vnext
+      traffic:
+      - revisionName: fib-knative-one
+        percent: 90
+      - revisionName: fib-knative-zero
+        percent: 10
     ```
 
-	Notice that we've added a rolloutPercent of 10. We've also added our old revision name to the revisions array. Your revision name will be different than `fib-knative-xxxxx`, so you will update this file.
+	First, notice that this revision is named `fib-knative-zero`, since the fibonacci sequence will now start with zero. You can see that we're using the vnext version of our application. 
+  
+  Next, take a look at the `traffic` block. You can see that we'll send 10% of our traffic to the new revision (`fib-knative-zero`), and 90% of our traffic to the old revision (`fib-knative-one`).
 
-2. Get the name of your first revision.
-
-    ```
-    kubectl get revision
-    ```
-
-    Expected Output:
-    ```
-    NAME                SERVICE NAME        GENERATION   READY   REASON
-    fib-knative-rgqjl   fib-knative-rgqjl   1            True    
-    ```
-
-3. Edit the `fib-service2.yaml` file to change `fib-knative-xxxxx` to your own revision name, which you got from the previous step. In this example, our revision name was `fib-knative-rgqjl`
-
-4. Apply your new configuration to the cluster.
+2. Apply this new configuration to the cluster.
 
     ```
     kubectl apply -f fib-service2.yaml
     ```
+
+3. Let's use `kn service describe` to see some details about our updated service.
+
+    ```
+    kn service describe fib-knative
+    ```
+    
+    Example Output:
+    ```
+    Name:       fib-knative
+    Namespace:  default
+    Age:        2m
+    URL:        http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
+
+    Revisions:  
+      10%  fib-knative-zero (current @latest) [2] (1m)
+            Image:  docker.io/ibmcom/fib-knative:vnext (at c13569)
+      90%  fib-knative-one [1] (2m)
+            Image:  docker.io/ibmcom/fib-knative (at 9eac25)
+
+    Conditions:  
+      OK TYPE                   AGE REASON
+      ++ Ready                   1m 
+      ++ ConfigurationsReady     1m 
+      ++ RoutesReady             1m 
+    ```
+    
+4. Notice the revisions section. You can see that 10% of the traffic will be sent to `fib-knative-zero`, and 90% of the traffic will be sent to `fib-knative-one`.
 
 5. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called.
 

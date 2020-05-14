@@ -61,30 +61,29 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 1. Take a look at the `image-from-source-task.yaml` file. This `Task` has inputs and outputs. The input resource is the github repository we just defined, and the output is the image that will be produced from that source. You'll notice that the build-and-push step of this `Task` uses Kaniko to build the source into a container image from a Dockerfile. Kaniko doesn't depend on a Docker engine and instead executes each command within the Dockerfile completely in userspace. This enables building container images in environments that can't easily or securely run a Docker engine, such as Kubernetes.
 
     ```
-    apiVersion: tekton.dev/v1alpha1
+    apiVersion: tekton.dev/v1beta1
     kind: Task
     metadata:
       name: build-docker-image-from-git-source
     spec:
-      inputs:
-        resources:
+      resources:
+        inputs:
           - name: docker-source
             type: git
-        params:
-          - name: pathToDockerFile
-            type: string
-            description: The path to the dockerfile to build
-            default: /workspace/docker-source/Dockerfile
-          - name: pathToContext
-            type: string
-            description:
-              The build context used by Kaniko
-              (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-            default: /workspace/docker-source
-      outputs:
-        resources:
+        outputs:
           - name: builtImage
             type: image
+      params:
+        - name: pathToDockerFile
+          type: string
+          description: The path to the dockerfile to build
+          default: /workspace/docker-source/Dockerfile
+        - name: pathToContext
+          type: string
+          description:
+            The build context used by Kaniko
+            (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
+          default: /workspace/docker-source
       steps:
         - name: build-and-push
           image: gcr.io/kaniko-project/executor:v0.9.0
@@ -95,9 +94,9 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
           command:
             - /kaniko/executor
           args:
-            - --dockerfile=${inputs.params.pathToDockerFile}
-            - --destination=${outputs.resources.builtImage.url}
-            - --context=${inputs.params.pathToContext}
+            - --dockerfile=$(params.pathToDockerFile)
+            - --destination=$(outputs.resources.builtImage.url)
+            - --context=$(params.pathToContext)
     ```
 
 2. Apply this yaml file to your kubernetes cluster.
@@ -105,32 +104,31 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
     kubectl apply -f image-from-source-task.yaml
     ```
   
-3. Now that our `Task` is defined, let's define a `TaskRun` that will run the `Task`. This `TaskRun` will bind inputs and outputs to our earlier defined resources, `fib-knative` and `fib-knative-git`. This `TaskRun` will also execute the `steps` we defined for our `Task`. Take a look at this file, called `image-from-source-task-run.yaml`.
+3. Now that our `Task` is defined, let's define a `TaskRun` that will run the `Task`. This `TaskRun` will bind inputs and outputs to our earlier defined resources, `fib-knative` and `fib-knative-git`. This `TaskRun` will also execute the `steps` we defined for our `Task`. We also define a `serviceAccount` for this `TaskRun` to utilize for any required permissions. Take a look at this file, called `image-from-source-task-run.yaml`.
 
     ```
-    apiVersion: tekton.dev/v1alpha1
+    apiVersion: tekton.dev/v1beta1
     kind: TaskRun
     metadata:
       name: build-docker-image-from-git-source-task-run
     spec:
-      serviceAccount: build-bot
+      serviceAccountName: build-bot
       taskRef:
         name: build-docker-image-from-git-source
-      inputs:
-        resources:
+      resources:
+        inputs:
           - name: docker-source
             resourceRef:
               name: fib-knative-git
-        params:
-          - name: pathToDockerFile
-            value: Dockerfile
-          - name: pathToContext
-            value: /workspace/docker-source/
-      outputs:
-        resources:
+        outputs:
           - name: builtImage
             resourceRef:
               name: fib-knative
+      params:
+        - name: pathToDockerFile
+          value: Dockerfile
+        - name: pathToContext
+          value: /workspace/docker-source/
     ```
 
 4. Apply this yaml file to your kubernetes cluster.
@@ -185,10 +183,11 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
     Expected Output:
 
       ```
-      NAME                                            READY   STATUS      RESTARTS   AGE
-      fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3     Running     0          56s
-      fib-knative-00002-deployment-58dcbdb97c-rrnzc   3/3   Terminating   0          89s
-      fib-knative-00002-deployment-58dcbdb97c-rrnzc   0/3   Terminating   0          91s
+      NAME                                                    READY   STATUS      RESTARTS   AGE
+      build-docker-image-from-git-source-task-run-pod-lwhl2   0/4     Completed   0          18h
+      fib-knative-built-rjn2g-deployment-6f6d9766cb-mr57f     2/2     Running     0          12s
+      fib-knative-built-rjn2g-deployment-6f6d9766cb-mr57f     2/2     Terminating   0          63s
+      fib-knative-built-rjn2g-deployment-6f6d9766cb-mr57f     0/2     Terminating   0          84s
       ```
 
-Congratulations! You've completed the Knative 101 lab. You should feel that you got a quick overview of deploying applications to Knative, using Tekton Pipelines, and seeing some of the benefits of Knative. If you're interested in diving a little deeper, check out the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.
+Congratulations! You've completed the Knative 101 lab. You have had a quick overview of deploying applications to Knative using the `kn` CLI and `kubectl` with .yaml files. You also tried out Tekton Pipelines for building your application from source and deploying it to a Kubernetes cluster. If you're interested in diving a little deeper, check out the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.

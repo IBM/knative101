@@ -31,23 +31,22 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with co
 
     File Contents:
     ```
-    apiVersion: serving.knative.dev/v1alpha1
+    apiVersion: serving.knative.dev/v1
     kind: Service
     metadata:
-        name: fib-knative
-        namespace: default
+      name: fib-knative
+      namespace: default
     spec:
-        release:
-            revisions: ["@latest"]
-            configuration:
-            revisionTemplate:
-                spec:
-                    container:
-                        image: docker.io/ibmcom/fib-knative
+      template:
+        metadata:
+          name: fib-knative-one
+        spec:
+          containers:
+            - image: docker.io/ibmcom/fib-knative
     ```
 
-    The `fib-service.yaml` file describes a Service. Notice that it includes the name (fib-knative), the namespace (default), and a reference to the container image on dockerhub (docker.io/ibmcom/fib-knative). 
-    
+    The `fib-service.yaml` file describes a Service. Notice that it includes the name (fib-knative), the namespace (default), and a reference to the container image on dockerhub (docker.io/ibmcom/fib-knative). Take a look at the `template` section of the Service spec. Any time this is updated, a new revision is created. In this case, our first revision will be named fib-knative-one.
+
 2. Let's deploy this app into our cluster. Apply the `fib-service.yaml` file.
 
     ```
@@ -68,7 +67,24 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with co
     kn service describe fib-knative
     ```
 
-5. The URL should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`.
+    Example Output:
+    ```
+    Name:       fib-knative
+    Namespace:  default
+    Age:        6s
+    URL:        http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
+
+    Revisions:  
+      100%  @latest (fib-knative-one) [1] (6s)
+            Image:  docker.io/ibmcom/fib-knative (at 9eac25)
+
+    Conditions:  
+      OK TYPE                   AGE REASON
+      ++ Ready                   2s 
+      ++ ConfigurationsReady     3s 
+      ++ RoutesReady             2s 
+    ```
+5. The URL should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`. You should also see some other interesting information like the name of your service and the latest revision, which is named `fib-knative-one`.
 
 6. We can now curl this URL to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
 

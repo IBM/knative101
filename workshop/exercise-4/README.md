@@ -2,14 +2,21 @@
 
 Did you notice that the Fibonacci sequence started with 1? Most would argue that the sequence should actually start with 0. There's a vnext version of the application that starts the sequence with 0 instead of 1. This container image has been built and deployed to dockerhub, and tagged as vnext. We'll deploy that as v2 of our app.
 
+### Update First Revision Name
+1. When we first deployed our application, we didn't provide a revision name, so Knative assigned a random revision name, something like `fib-knative-lhghx-1`. Let's give the service the revision name `fib-knative-one` since in this version of the application the sequence begins with one. Naming our own revisions can be helpful for readability, but isn't required. We'll later use this revision name to route traffic between two different revisions.
+
+    ```
+    kn service update fib-knative --revision-name fib-knative-one
+    ```
+
 ### Deploy vnext
-1. Let's deploy vnext, again using a docker image on dockerhub.
+1. Let's deploy the next version of our application, where the Fibonacci sequence begins with 0. We will again deploy from a docker image on dockerhub.
 
     ```
      kn service update fib-knative --image docker.io/ibmcom/fib-knative:vnext --revision-name fib-knative-zero 
     ```
 
-	First, notice that this revision is named `fib-knative-zero`, since the fibonacci sequence will now start with zero. You can see that we're using the vnext version of our application.
+	First, notice that this revision is named `fib-knative-zero`, since the Fibonacci sequence will now start with zero. You can see that we're using the vnext version of our application.
 
 2. Let's see the details for our Service, again using `kn service describe`
 
@@ -49,7 +56,7 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
     ```
 
   
-4. What if, instead of 100% of the traffic going to the new revision, we wanted a different percentage? Maybe we want to slowly roll users over from our old version to the new version, or do some A/B testing of the new version to see what users like better. Let's update the service to send 10% of the traffic to our new revision (`fib-knative-zero`), and 90% to the old revision (`fib-knative-one`)
+4. What if, instead of 100% of the traffic going to the new revision, we wanted a different percentage? Maybe we want to slowly roll users over from our old version to the new version, or do some A/B testing of the new version to see what users prefer. Let's update the service to send 10% of the traffic to our new revision (`fib-knative-zero`), and 90% to the old revision (`fib-knative-one`)
 
     ```
     kn service update fib-knative --traffic fib-knative-zero=10 --traffic fib-knative-one=90

@@ -2,7 +2,25 @@
 
 In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
 
-1. You will need to first create an IBM Container Registry namespace. Let's confirm you're logged in.
+### Clone the application repo
+Let's first get the code we'll use for this portion of the lab. This repository contains the code for the Fibonacci application as well as various .yaml files we'll be using.
+
+1. Clone the git repository:
+
+    ```
+    git clone https://github.com/IBM/fib-knative.git
+    ```
+
+2. Change directories to the fib-knative folder.
+
+    ```
+    cd fib-knative
+    ```
+
+### Create an IBM Container Registry namespace
+We will later use this container registry to store the image that we're building from our git repository.
+
+3. You will now need to create an IBM Container Registry namespace. Let's confirm you're logged in.
 
     ```
     ibmcloud login
@@ -11,19 +29,19 @@ In the previous exercises, we deployed a container to Knative directly from dock
     When prompted, select your own account, and then enter the number for the region `us-south`.
 
 
-1. Add a namespace to your account. You must create at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can create multiple namespaces as well as control access to your namespaces by using IAM policies.
+4. Add a namespace to your account. You must create at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can create multiple namespaces as well as control access to your namespaces by using IAM policies.
 
     ```
     ibmcloud cr namespace-add <my_namespace>
     ```
 
-2. Create an API key. This API key can be used to automate pushing and pulling of Docker images to and from your namespaces. The automated build processes you'll be setting up will use this key to access your images.
+5. Create an API key. This API key can be used to automate pushing and pulling of Docker images to and from your namespaces. The automated build processes you'll be setting up will use this key to access your images.
 
     ```
     ibmcloud iam api-key-create mykey -d "API key for IBM Cloud"
     ```
 
-3. The CLI output should include the API Key value. Create an environment variable containing your key.
+6. The CLI output should include the API Key value. Create an environment variable containing your key.
 
     ```
     export MYAPIKEY=<your_api_key_value>
@@ -83,4 +101,4 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
 Congratulations! You've set up some required credentials that the Tekton Pipeline process will use to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
 
 
-Continue on to [exercise 7](../exercise-7/README.md).
+Continue on to [exercise 8](../exercise-8/README.md).

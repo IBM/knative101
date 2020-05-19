@@ -18,7 +18,7 @@ Because Knative is built on top of Kubernetes, we can access all of these resour
     You should see some pods to indicate that your application is running. You may see pods for both versions of your application (-zero and -one). Wait about 90 seconds, and you should see that your application scales back down to zero and the pods terminate due to lack of use. You should eventually see the pods move from the `Running` to the `Terminating` state.
 
     Example Output:
-    
+
     ```
     NAME                                                    READY   STATUS      RESTARTS   AGE
     fib-knative-one-deployment-79d6cb9cbd-v4th5             2/2     Running     0          43s
@@ -145,4 +145,4 @@ Because Knative is built on top of Kubernetes, we can access all of these resour
     kn service delete fib-knative
     ```
 
-Continue on to [exercise 7](../exercise-7/README.md).
+Congratulations! You've completed the first part of the Knative 101 lab. You have had a quick overview of deploying applications to Knative using the `kn` CLI as well as using `kubectl` to do some advanced debugging and exploration. You can continue to the advanced portion of this lab with [exercise 7](../exercise-7/README.md) or you can go to the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.

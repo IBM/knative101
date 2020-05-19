@@ -1,6 +1,8 @@
 ## Deploy vnext Version and Apply Traffic Shifting
 
-Did you notice that the Fibonacci sequence started with 1? Most would argue that the sequence should actually start with 0. There's a vnext version of the application that starts the sequence with 0 instead of 1. This container image has been built and deployed to dockerhub, and tagged as vnext. We'll deploy that as v2 of our app.
+Did you notice that the Fibonacci sequence started with 1? Many would argue that the sequence should actually start with 0. There's a vnext version of the application that starts the sequence with 0 instead of 1. This container image has been built and deployed to dockerhub, and tagged as vnext. We'll deploy that as v2 of our app, and then route a small percentage of the traffic to it.
+
+![](https://github.com/knative/serving/raw/master/docs/spec/images/fibknativev2.png)
 
 ### Update First Revision Name
 1. When we first deployed our application, we didn't provide a revision name, so Knative assigned a random revision name, something like `fib-knative-lhghx-1`. Let's give the service the revision name `fib-knative-one` since in this version of the application the sequence begins with one. Naming our own revisions can be helpful for readability, but isn't required. We'll later use this revision name to route traffic between two different revisions.
@@ -56,7 +58,7 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
     ```
 
   
-4. What if, instead of 100% of the traffic going to the new revision, we wanted a different percentage? Maybe we want to slowly roll users over from our old version to the new version, or do some A/B testing of the new version to see what users prefer. Let's update the service to send 10% of the traffic to our new revision (`fib-knative-zero`), and 90% to the old revision (`fib-knative-one`)
+4. What if we didn't want 100% of our traffic going to this new revision? Maybe we want to slowly roll users over from our old version to the new version, or do some A/B testing of the new version to see what users prefer. Let's update the service to send 10% of the traffic to our new revision (`fib-knative-zero`), and 90% to the old revision (`fib-knative-one`)
 
     ```
     kn service update fib-knative --traffic fib-knative-zero=10 --traffic fib-knative-one=90
@@ -77,7 +79,7 @@ Did you notice that the Fibonacci sequence started with 1? Most would argue that
             Image:  docker.io/ibmcom/fib-knative (pinned to 9eac25)
     ```
 
-6. Let's run some load against the app, just asking for the first number in the Fibonacci sequence so that we can clearly see which revision is being called.
+6. Let's run some load against the app, just requesting the first number in the Fibonacci sequence so that we can clearly see which revision is being called.
 
 	```
 	while sleep 0.5; do curl "$MY_APP_URL/1"; done

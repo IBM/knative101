@@ -20,7 +20,7 @@ Let's first get the code we'll use for this portion of the lab. This repository 
 ### Create an IBM Container Registry namespace
 We will later use this container registry to store the image that we're building from our git repository.
 
-3. You will now need to create an IBM Container Registry namespace. Let's confirm you're logged in.
+1. You will now need to create an IBM Container Registry namespace. Let's confirm you're logged in.
 
     ```
     ibmcloud login
@@ -29,19 +29,19 @@ We will later use this container registry to store the image that we're building
     When prompted, select your own account, and then enter the number for the region `us-south`.
 
 
-4. Add a namespace to your account. You must create at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can create multiple namespaces as well as control access to your namespaces by using IAM policies.
+2. Add a namespace to your account. You must create at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can create multiple namespaces as well as control access to your namespaces by using IAM policies.
 
     ```
     ibmcloud cr namespace-add <my_namespace>
     ```
 
-5. Create an API key. This API key can be used to automate pushing and pulling of Docker images to and from your namespaces. The automated build processes you'll be setting up will use this key to access your images.
+3. Create an API key. This API key can be used to automate pushing and pulling of Docker images to and from your namespaces. The automated build processes you'll be setting up will use this key to access your images.
 
     ```
     ibmcloud iam api-key-create mykey -d "API key for IBM Cloud"
     ```
 
-6. The CLI output should include the API Key value. Create an environment variable containing your key.
+4. The CLI output should include the API Key value. Create an environment variable containing your key.
 
     ```
     export MYAPIKEY=<your_api_key_value>

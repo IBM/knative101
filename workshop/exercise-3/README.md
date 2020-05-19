@@ -4,9 +4,9 @@ The Knative client, `kn`, aims to make interacting with Knative a seamless exper
 # Our First Knative Service
 Knative Serving enables rapid deploying and serving of serverless applications. Those applications will automatically scale up, and then back down to zero. In this exercise, we'll use the Knative Serving component to deploy our first application from a container image hosted on dockerhub. 
 
-The Knative Service object automatically manages the whole lifecycle for your workload. A Service represents your app on Knative. Services control the creation of other objects to ensure that your app has a URL and a new revision for each update of the service.
+The Knative Service object automatically manages the whole lifecycle for your workload. A Service represents your app on Knative. Services control the creation of other objects to ensure that your app has a URL and a new Revision for each update of the service.
 
-![](https://github.com/knative/serving/raw/master/docs/spec/images/object_model.png)
+![](https://github.com/knative/serving/raw/master/docs/spec/images/fibknativev1.png)
 
 # Deploy our Application to Knative using kn
 We've already created an image on dockerhub that contains the first version of our Fibonacci application. If we call the `/` endpoint, and pass in a `number` parameter, we should get the first `n` numbers of the Fibonacci sequence.
@@ -32,7 +32,7 @@ We've already created an image on dockerhub that contains the first version of o
     http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
     ```
 
-You should see your cluster name as a part of the URL, since IBM Cloud Kubernetes Service sets the default domain name for Knative to match the domain name of your cluster.
+    You should see your cluster name as a part of the URL, since IBM Cloud Kubernetes Service sets the default domain name for Knative to match the domain name of your cluster.
 
 3. Save this URL as an environment variable, so that we can use it throughout the lab:
 
@@ -64,7 +64,7 @@ You should see your cluster name as a part of the URL, since IBM Cloud Kubernete
       ++ RoutesReady             6s 
     ```
 
-    We can see the URL, the name of the service, as well as some status information about the service. We can also look at the various revisions for this service. Currently, we only have one revision with 100% of the traffic being routed there.
+    We can see the URL, the name of the service, and some status information about the service. We can also look at the various revisions for this service. Currently, we only have one revision with 100% of the traffic being routed there.
 
 5. Let's try out our application! We can curl the URL to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the Fibonacci sequence.
 

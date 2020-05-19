@@ -1,9 +1,10 @@
 ## Tag revisions to generate custom app URLs
 
-What if we wanted to create URLs that are specific for each of the two revisions we created earlier? Maybe one of the revisions is for staging, and one is for production? You can ask Knative to automatically create a URL for a specific revision by using the --tag option.
+What if we wanted to create URLs that are specific for each of the two revisions we created earlier? Maybe one of the revisions is for staging, and one is for production. You can automatically create a URL for a specific revision by using the --tag option.
 
 ### Tag revisions
 1. Let's tag both of our revisions. We'll tag `fib-knative-zero` as `zero`, and `fib-knative-one` as `one`.
+
     ```
     kn service update fib-knative --tag fib-knative-zero=zero --tag fib-knative-one=one
     ```
@@ -19,7 +20,7 @@ What if we wanted to create URLs that are specific for each of the two revisions
     http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
     ```
 
-    Add `zero-` or `one-` before the service name to get your new URL, and then save these as environment variables. The new URLs will look something like this:
+    Add `zero-` or `one-` before the service name to get your new URLs, and then save these as environment variables. The new URLs will look something like this:
     ```
     export ZERO_URL=http://zero-fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
     ```

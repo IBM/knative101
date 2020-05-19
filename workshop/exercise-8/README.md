@@ -176,9 +176,9 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
     curl $MY_BUILT_DOMAIN/20
     ```
 
-6. You should see the first 20 Fibonacci numbers!
+    You should see the first 20 Fibonacci numbers!
 
-7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state. Note: To exit the watch, use `ctrl + c`.
+8. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state. Note: To exit the watch, use `ctrl + c`.
 
     Expected Output:
 
@@ -190,4 +190,4 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
       fib-knative-built-rjn2g-deployment-6f6d9766cb-mr57f     0/2     Terminating   0          84s
       ```
 
-Congratulations! You've completed the Knative 101 lab. You have had a quick overview of deploying applications to Knative using the `kn` CLI and `kubectl` with .yaml files. You also tried out Tekton Pipelines for building your application from source and deploying it to a Kubernetes cluster. If you're interested in diving a little deeper, check out the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.
+Congratulations! You've completed the Knative 101 lab. You have had a quick overview of deploying applications to Knative using the `kn` CLI as well as using `kubectl` to do some advanced debugging and exploration. You also tried out Tekton Pipelines for building your application from source and deploying it to a Kubernetes cluster. If you're interested in diving a little deeper, check out the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.

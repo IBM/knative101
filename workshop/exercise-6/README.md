@@ -1,6 +1,5 @@
 ## Advanced Debugging
-Up until this point, we've used the Knative CLI to deploy, update, and interact with our application. While our application is running on Kubernetes, we haven't had to interact with any of the underlying Kubernetes components. If we wanted to control or view the application at this layer of the stack, we certainly could.
-
+Up until this point, we've used the Knative CLI to deploy, update, and interact with our application. While our application is running on Kubernetes, we haven't had to interact with any of the underlying Kubernetes components. If we did want to control or view the application at this layer of the stack, we certainly could.
 
 ### Knative from the Kubernetes Layer
 Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/docs/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
@@ -16,14 +15,16 @@ Because Knative is built on top of Kubernetes, we can access all of these resour
     kubectl get pods --watch
     ```
 
-You should see some pods to indicate that your application is running. Wait about 90 seconds, and you should see that your application scales back down to zero and the pods terminate due to lack of use.
+You should see some pods to indicate that your application is running. You may see pods for both versions of your application (-zero and -one). Wait about 90 seconds, and you should see that your application scales back down to zero and the pods terminate due to lack of use. You should eventually see the pods move from the `Running` to the `Terminating` state.
 
     Example Output
     ```
     NAME                                                    READY   STATUS      RESTARTS   AGE
     fib-knative-one-deployment-79d6cb9cbd-v4th5             2/2     Running     0          43s
+    fib-knative-zero-deployment-968c8896-8mhkx              2/2     Running     0          60s
     fib-knative-one-deployment-79d6cb9cbd-v4th5             2/2     Terminating   0          86s
     fib-knative-one-deployment-79d6cb9cbd-v4th5             0/2     Terminating   0          96s
+    fib-knative-zero-deployment-968c8896-8mhkx              0/2     Terminating   0          96s
     ```
    
     Note: To exit the watch, use `ctrl + c`.
@@ -40,7 +41,7 @@ You should see some pods to indicate that your application is running. Wait abou
     fib-knative         fib-knative-zero          fib-knative-zero          True    
     ```
 
-2. Next, let's see some of the details of the fib-knative Configuration.    
+3. Next, let's see some of the details of the fib-knative Configuration.    
 
     ```
     kubectl get configuration fib-knative -o yaml
@@ -101,7 +102,7 @@ You should see some pods to indicate that your application is running. Wait abou
     
     The Configuration shows the desired state for our application. You can see the image that our Service is using, as well as the namespace the Service is in, the status of the Service, and some other configuration information.
 
-3. When creating your Service, some other objects were created in Kubernetes as well, such as Routes or Revisions. Let's check out the Route. In the `traffic` section you can see the two URLs that were created when we tagged the revisions.
+4. When creating your Service, some other objects were created in Kubernetes as well, such as Routes or Revisions. Let's check out the Route. In the `traffic` section you can see the two URLs that were created when we tagged the revisions, as well as the percentage of traffic going to each Revision.
 
     ```
     kubectl get route fib-knative -o yaml
@@ -123,7 +124,7 @@ You should see some pods to indicate that your application is running. Wait abou
         url: http://one-fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
       url: http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
       ```
-4. We can also see a list of Revisions created in Kubernetes:
+5. We can also see a list of Revisions created in Kubernetes:
 
     ```
     kubectl get revision
@@ -137,7 +138,7 @@ You should see some pods to indicate that your application is running. Wait abou
     fib-knative-zero          fib-knative         fib-knative-zero          3            True    
     ```
 
-4. In the next section, we'll be deploying the same application, but with a different method, solet's clean up our service.
+6. In the next section, we'll be deploying the same application, but with a different method, so let's clean up our service.
 
     ```
     kn service delete fib-knative

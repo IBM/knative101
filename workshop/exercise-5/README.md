@@ -31,6 +31,7 @@ What if we wanted to create URLs that are specific for each of the two revisions
 
 3. Let's try out our URLs to confirm that we're getting the expected results! 
 
+    Try the URL for version 1 of the app:
     ```
     curl $ZERO_URL/4
     ```
@@ -40,6 +41,7 @@ What if we wanted to create URLs that are specific for each of the two revisions
     [0,1,1,2]
     ```
 
+    Try the URL for version 2 of the app:
     ```
     curl $ONE_URL/4
     ```

@@ -149,7 +149,7 @@ A `PipelineResource` is used to define artifacts that are passed into and out of
 
 2. Apply the `service.yaml` file to your cluster.
     ```
-     kubectl apply -f service.yaml
+    kubectl apply -f service.yaml
     ```
 
 3. Run `kubectl get pods --watch` to see the pods initializing. Note: To exit the watch, use `ctrl + c`.

@@ -15,9 +15,10 @@ Because Knative is built on top of Kubernetes, we can access all of these resour
     kubectl get pods --watch
     ```
 
-You should see some pods to indicate that your application is running. You may see pods for both versions of your application (-zero and -one). Wait about 90 seconds, and you should see that your application scales back down to zero and the pods terminate due to lack of use. You should eventually see the pods move from the `Running` to the `Terminating` state.
+    You should see some pods to indicate that your application is running. You may see pods for both versions of your application (-zero and -one). Wait about 90 seconds, and you should see that your application scales back down to zero and the pods terminate due to lack of use. You should eventually see the pods move from the `Running` to the `Terminating` state.
 
-    Example Output
+    Example Output:
+    
     ```
     NAME                                                    READY   STATUS      RESTARTS   AGE
     fib-knative-one-deployment-79d6cb9cbd-v4th5             2/2     Running     0          43s

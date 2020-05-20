@@ -1,11 +1,11 @@
-## Advanced Debugging
+## Knative from the Kubernetes Layer
 Up until this point, we've used the Knative CLI to deploy, update, and interact with our application. While our application is running on Kubernetes, we haven't had to interact with any of the underlying Kubernetes components. If we did want to control or view the application at this layer of the stack, we certainly could.
 
-### Knative from the Kubernetes Layer
 Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/docs/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
 
 Because Knative is built on top of Kubernetes, we can access all of these resource types from the Kubernetes layer in the stack.
 
+### Explore Application Deployment Using Kubectl
 1. Our application may have already scaled down to zero. Let's curl the application, and then view the pods our application is running on.
 
     ```

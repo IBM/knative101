@@ -1,92 +1,52 @@
-## Clone the Application Repo and Deploy our Application using Kubectl and yaml
+## Deploy vnext Version and Apply Traffic Shifting
 
-### Clone the application repo
-Let's get the code we'll use for today's lab. This repository contains the code for the Fibonacci application as well as various .yaml files we'll use throughout the lab.
+Did you notice that the Fibonacci sequence started with 1? Many would argue that the sequence should actually start with 0. There's a vnext version of the application that starts the sequence with 0 instead of 1. This container image has been built and deployed to dockerhub, and tagged as vnext. We'll deploy that as v2 of our app, and then route a small percentage of the traffic to it.
 
-1. Clone the git repository:
+![](../README_images/fibknativev2.png)
 
-    ```
-    git clone https://github.com/IBM/fib-knative.git
-    ```
-
-2. Change directories to the fib-knative folder.
+### Update First Revision Name
+1. When we first deployed our application, we didn't provide a revision name, so Knative assigned a random revision name, something like `fib-knative-lhghx-1`. Let's give the service the revision name `fib-knative-one` since in this version of the application the sequence begins with one. Naming our own revisions can be helpful for readability, but isn't required. We'll later use this revision name to route traffic between two different revisions.
 
     ```
-    cd fib-knative
+    kn service update fib-knative --revision-name fib-knative-one
     ```
 
-## Deploy Our Application using kubectl and yaml
-In this exercise, we'll use the Knative Serving component to deploy our application from a container image hosted on dockerhub. Instead of using the `kn` cli, we'll use `kubectl` and `.yaml` files. This should feel familiar if you're a kubernetes user.
-
-### Create the Configuration and Route for our Service
-Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/docs/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
-
-Because Knative is built on top of Kubernetes, you can use kubectl along with configuration files to create a new Service representing your application.
-
-1. In the `fib-knative` project you cloned earlier, you should see a file called `fib-service.yaml`. Look at the contents of the file:
+### Deploy vnext
+1. Let's deploy the next version of our application, where the Fibonacci sequence begins with 0. We will again deploy from a docker image on dockerhub.
 
     ```
-    cat fib-service.yaml
+     kn service update fib-knative --image docker.io/ibmcom/fib-knative:vnext --revision-name fib-knative-zero 
     ```
 
-    File Contents:
-    ```
-    apiVersion: serving.knative.dev/v1
-    kind: Service
-    metadata:
-      name: fib-knative
-      namespace: default
-    spec:
-      template:
-        metadata:
-          name: fib-knative-one
-        spec:
-          containers:
-            - image: docker.io/ibmcom/fib-knative
-    ```
+	First, notice that this revision is named `fib-knative-zero`, since the Fibonacci sequence will now start with zero. You can see that we're using the vnext version of our application.
 
-    The `fib-service.yaml` file describes a Service. Notice that it includes the name (fib-knative), the namespace (default), and a reference to the container image on dockerhub (docker.io/ibmcom/fib-knative). Take a look at the `template` section of the Service spec. Any time this is updated, a new revision is created. In this case, our first revision will be named fib-knative-one.
-
-2. Let's deploy this app into our cluster. Apply the `fib-service.yaml` file.
-
-    ```
-    kubectl apply --filename fib-service.yaml
-    ```
-
-3. Watch the pods initializing as our application gets deployed and starts up:
-
-    ```
-    kubectl get pods --watch
-    ```
-
-    Note: To exit the watch, use `ctrl + c`.
-
-4. Let's try out our application again! Because the service name was the same as the application you deployed before, `fib-knative`, the URL for our service should be the same. You can double check if you want.
+2. Let's see the details for our Service, again using `kn service describe`
 
     ```
     kn service describe fib-knative
     ```
 
-    Example Output:
+    Example output:
     ```
     Name:       fib-knative
     Namespace:  default
-    Age:        6s
+    Age:        1m
     URL:        http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
 
     Revisions:  
-      100%  @latest (fib-knative-one) [1] (6s)
-            Image:  docker.io/ibmcom/fib-knative (at 9eac25)
+      100%  @latest (fib-knative-zero) [2] (9s)
+            Image:  docker.io/ibmcom/fib-knative:vnext (pinned to c13569)
 
     Conditions:  
       OK TYPE                   AGE REASON
-      ++ Ready                   2s 
-      ++ ConfigurationsReady     3s 
-      ++ RoutesReady             2s 
+      ++ Ready                   5s 
+      ++ ConfigurationsReady     6s 
+      ++ RoutesReady             5s 
     ```
-5. The URL should look something like `fib-knative.default.bmv-knative-lab.us-south.containers.appdomain.cloud`. You should also see some other interesting information like the name of your service and the latest revision, which is named `fib-knative-one`.
+  
+    We can see that our latest revision (fib-knative-zero) has 100% of the traffic being routed to it.
 
-6. We can now curl this URL to try out our application. Notice that we're calling the `/` endpoint, and passing in a `number` parameter of 5. This should return the first 5 numbers of the fibonacci sequence.
+3. We can try out the application by curling the URL. We should see that the sequence now starts with zero.
 
     ```
     curl $MY_APP_URL/5
@@ -94,15 +54,43 @@ Because Knative is built on top of Kubernetes, you can use kubectl along with co
 
     Expected Output:
     ```
-    [1,1,2,3,5]
+    [0, 1, 1, 2, 3]
     ```
 
-7. Congratulations! You've got your Knative application deployed and responding to requests again, but this time you deployed with `kubectl` and `.yaml` files. Try sending some different number requests. If you stop making requests to the application, you should eventually see that your application scales itself back down to zero. Watch the pod until you see that it is `Terminating`. This should take approximately 90 seconds.
+  
+4. What if we didn't want 100% of our traffic going to this new revision? Maybe we want to slowly roll users over from our old version to the new version, or do some A/B testing of the new version to see what users prefer. Let's update the service to send 10% of the traffic to our new revision (`fib-knative-zero`), and 90% to the old revision (`fib-knative-one`)
 
     ```
-    kubectl get pods --watch
+    kn service update fib-knative --traffic fib-knative-zero=10 --traffic fib-knative-one=90
     ```
 
-    Note: To exit the watch, use `ctrl + c`.
+5. Again, we can use `kn service describe` to see these changes. Notice the revisions section. You can see that 10% of the traffic will be sent to `fib-knative-zero`, and 90% of the traffic will be sent to `fib-knative-one`.
 
-Continue on to [exercise 5](../exercise-5/README.md).
+    ```
+    kn service describe fib-knative
+    ```
+
+    Expected Output:
+    ```
+    Revisions:  
+      10%  fib-knative-zero (current @latest) [2] (58m)
+            Image:  docker.io/ibmcom/fib-knative:vnext (pinned to c13569)
+      90%  fib-knative-one [1] (59m)
+            Image:  docker.io/ibmcom/fib-knative (pinned to 9eac25)
+    ```
+
+6. Let's run some load against the app, just requesting the first number in the Fibonacci sequence so that we can clearly see which revision is being called.
+
+	```
+	while sleep 0.5; do curl "$MY_APP_URL/1"; done
+	```
+
+    Expected Output:
+    ```
+    [1][1][0][1][1][1][1][1][1][1][1]
+    ```
+    
+7. We should see that the curl requests are routed approximately 90/10 between the two revisions. Let's kill this process using `ctrl + c`.
+
+
+Congratulations! You've deployed two versions of the fib-knative application, and then updated the rollout percentage of your application. Continue on to [exercise 5](../exercise-5/README.md).

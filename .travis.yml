@@ -1,3 +1,5 @@
-language: script
+language: bash
+sudo: required
 
-script: bash ./.verify-links.sh -v
+script:
+  - ./travis/verify-links.sh

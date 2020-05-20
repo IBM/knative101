@@ -1,193 +1,104 @@
-## (OPTIONAL, FOR ADVANCED USERS) Build and Deploy our Knative Application
+## (OPTIONAL, FOR ADVANCED USERS) Set up a Private Container Image Registry and Obtain Credentials
 
-We've seen how to deploy an application from an image that already exists, so let's build the image ourselves from source code. We'll be using Tekton Pipelines, a project providing Kubernetes-style resources for declaring CI/CD pipelines. We'll fetch our source code from a github repository, build a container image from it, push it to a private container image registry on IBM Cloud, and then ultimately get a URL to access our application.
+In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
 
-### Tekton Components Overview
+### Clone the application repo
+Let's first get the code we'll use for this portion of the lab. This repository contains the code for the Fibonacci application as well as various .yaml files we'll be using.
 
-First, let's understand a few of the Tekton components we will be using in this exercise. A `Task` defines work that needs to be executed, and is made up of a series of `steps` that will be executed sequentially.
-
-A `TaskRun` will run the `Task` that you defined. You can then view output from the `TaskRun`.
-
-The main goal of Tekton Pipelines is to run your `Task` individually or as a part of a `Pipeline`. Each `Task` runs as a Pod on your Kubernetes cluster with each step as its own container.
-
-A `PipelineResource` is used to define artifacts that are passed into and out of a `Task`. There are a few sytem defined resource types ready to use, such as `git` or `image` resources.  
-
-### Create the Required PipelineResources
-
-1. Take a look at the `git-resource.yaml` file. 
-    ```
-    apiVersion: tekton.dev/v1alpha1
-    kind: PipelineResource
-    metadata:
-      name: fib-knative
-    spec:
-      type: git
-      params:
-        - name: revision
-          value: master
-        - name: url
-          value: https://github.com/IBM/fib-knative
-    ```
-    You can see that this file is defining the git resource we will be building. It includes the git url and revision for our code.
-
-2. Apply this yaml file to your kubernetes cluster.
-    ```
-    kubectl apply -f git-resource.yaml
-    ```
-
-3. Take a look at the `image-resource.yaml` file.
-    ```
-    apiVersion: tekton.dev/v1alpha1
-    kind: PipelineResource
-    metadata:
-      name: fib-knative
-    spec:
-      type: image
-      params:
-        - name: url
-          value: us.icr.io/<NAMESPACE>/fib-knative
-    ```
-    This file defines the location where our built image will be stored. In our case, we'll be storing it on the IBM Cloud Container Registry. 
-
-4. Make sure you update the image value with your own container registry namespace, which you defined in exercise 6. Replace <NAMESPACE> with your own namespace.
-
-5. Apply this yaml file to your kubernetes cluster.
-    ```
-    kubectl apply -f image-resource.yaml
-    ```
-
-### Build Image From Source and Push to Container Registry
-
-1. Take a look at the `image-from-source-task.yaml` file. This `Task` has inputs and outputs. The input resource is the github repository we just defined, and the output is the image that will be produced from that source. You'll notice that the build-and-push step of this `Task` uses Kaniko to build the source into a container image from a Dockerfile. Kaniko doesn't depend on a Docker engine and instead executes each command within the Dockerfile completely in userspace. This enables building container images in environments that can't easily or securely run a Docker engine, such as Kubernetes.
+1. Clone the git repository:
 
     ```
-    apiVersion: tekton.dev/v1beta1
-    kind: Task
-    metadata:
-      name: build-docker-image-from-git-source
-    spec:
-      resources:
-        inputs:
-          - name: docker-source
-            type: git
-        outputs:
-          - name: builtImage
-            type: image
-      params:
-        - name: pathToDockerFile
-          type: string
-          description: The path to the dockerfile to build
-          default: /workspace/docker-source/Dockerfile
-        - name: pathToContext
-          type: string
-          description:
-            The build context used by Kaniko
-            (https://github.com/GoogleContainerTools/kaniko#kaniko-build-contexts)
-          default: /workspace/docker-source
-      steps:
-        - name: build-and-push
-          image: gcr.io/kaniko-project/executor:v0.9.0
-          # specifying DOCKER_CONFIG is required to allow kaniko to detect docker credential
-          env:
-            - name: "DOCKER_CONFIG"
-              value: "/builder/home/.docker/"
-          command:
-            - /kaniko/executor
-          args:
-            - --dockerfile=$(params.pathToDockerFile)
-            - --destination=$(outputs.resources.builtImage.url)
-            - --context=$(params.pathToContext)
+    git clone https://github.com/IBM/fib-knative.git
     ```
 
-2. Apply this yaml file to your kubernetes cluster.
-    ```
-    kubectl apply -f image-from-source-task.yaml
-    ```
-  
-3. Now that our `Task` is defined, let's define a `TaskRun` that will run the `Task`. This `TaskRun` will bind inputs and outputs to our earlier defined resources, `fib-knative` and `fib-knative-git`. This `TaskRun` will also execute the `steps` we defined for our `Task`. We also define a `serviceAccount` for this `TaskRun` to utilize for any required permissions. Take a look at this file, called `image-from-source-task-run.yaml`.
+2. Change directories to the fib-knative folder.
 
     ```
-    apiVersion: tekton.dev/v1beta1
-    kind: TaskRun
-    metadata:
-      name: build-docker-image-from-git-source-task-run
-    spec:
-      serviceAccountName: build-bot
-      taskRef:
-        name: build-docker-image-from-git-source
-      resources:
-        inputs:
-          - name: docker-source
-            resourceRef:
-              name: fib-knative-git
-        outputs:
-          - name: builtImage
-            resourceRef:
-              name: fib-knative
-      params:
-        - name: pathToDockerFile
-          value: Dockerfile
-        - name: pathToContext
-          value: /workspace/docker-source/
+    cd fib-knative
     ```
 
-4. Apply this yaml file to your kubernetes cluster.
-    ```
-    kubectl apply -f image-from-source-task-run.yaml
-    ```
+### Create an IBM Container Registry namespace
+We will later use this container registry to store the image that we're building from our git repository.
 
-5. To see the output of the `TaskRun`, you can use the following command:
+1. You will now need to create an IBM Container Registry namespace. Let's confirm you're logged in.
+
     ```
-    kubectl get taskruns/build-docker-image-from-git-source-task-run -o yaml
-    ```
-
-    You should see that the steps executed successfully. Congratulations! At this point, you've successfully used Tekton Pipelines to build a docker image from some source code on github. Next, let's deploy that docker image to knative!
-
-### Deploy the Fibonacci App Using kubectl and service.yaml
-
-1. Edit the `service.yaml` file to point to your own container registry namespace by replacing the instance of `<NAMESPACE>` with the container registry namespace you created earlier. 
-
-2. Apply the `service.yaml` file to your cluster.
-    ```
-     kubectl apply -f service.yaml
+    ibmcloud login
     ```
 
-3. Run `kubectl get pods --watch` to see the pods initializing. Note: To exit the watch, use `ctrl + c`.
+    When prompted, select your own account, and then enter the number for the region `us-south`.
 
-4. Take a look at the `service.yaml` file again:
-    ```
-    cat service.yaml
-    ```
 
-  You should see values for the serviceAccount that you created earlier, as well as the image that we're deploying to knative. This is the image you just built using Tekton.
+2. Add a namespace to your account. You must create at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can create multiple namespaces as well as control access to your namespaces by using IAM policies.
 
-5. This application has a different name, and will have a different domain. Let's get that URL now.
     ```
-    kn service describe fib-knative-built
+    ibmcloud cr namespace-add <my_namespace>
     ```
 
-6. The route should begin with `fib-knative-built`, and look something like `fib-knative-built-default.bmv-knative-lab.us-south.containers.appdomain.cloud`. Save that in an environment variable now:
-    ```
-    export MY_BUILT_DOMAIN=fib-knative-built....
-    ```
+3. Create an API key. This API key can be used to automate pushing and pulling of Docker images to and from your namespaces. The automated build processes you'll be setting up will use this key to access your images.
 
-7. Now that the app is up, we should be able to call it using a number input. We can do that using a curl command against the URL provided to us. Ensure you've updated the command with your own ingress subdomain.
     ```
-    curl $MY_BUILT_DOMAIN/20
+    ibmcloud iam api-key-create mykey -d "API key for IBM Cloud"
     ```
 
-6. You should see the first 20 Fibonacci numbers!
+4. The CLI output should include the API Key value. Create an environment variable containing your key.
 
-7. If we left this application alone for some time, it would scale itself back down to 0, and terminate the pods that were created. Run `kubectl get pods --watch` and wait until you see the application scale itself back down to 0. When the application is no longer in use, you should eventually see the pods move from the `Running` to the `Terminating` state. Note: To exit the watch, use `ctrl + c`.
+    ```
+    export MYAPIKEY=<your_api_key_value>
+    ```
 
-    Expected Output:
+### Provide Container Registry Credentials to Cluster
+This lab will need credentials for authenticating to your private container registry. First, we'll need to create a `Secret` to store the credentials for this registry. This secret will be used for the knative-serving component to pull down an image from the container registry.
 
-      ```
-      NAME                                                    READY   STATUS      RESTARTS   AGE
-      build-docker-image-from-git-source-task-run-pod-lwhl2   0/4     Completed   0          18h
-      fib-knative-built-rjn2g-deployment-6f6d9766cb-mr57f     2/2     Running     0          12s
-      fib-knative-built-rjn2g-deployment-6f6d9766cb-mr57f     2/2     Terminating   0          63s
-      fib-knative-built-rjn2g-deployment-6f6d9766cb-mr57f     0/2     Terminating   0          84s
-      ```
+A `Secret` is a Kubernetes object containing sensitive data such as a password, a token, or a key. You can also read more about [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/).
 
-Congratulations! You've completed the Knative 101 lab. You have had a quick overview of deploying applications to Knative using the `kn` CLI and `kubectl` with .yaml files. You also tried out Tekton Pipelines for building your application from source and deploying it to a Kubernetes cluster. If you're interested in diving a little deeper, check out the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.
+1. Let's create a secret, which will be a `docker-registry` type secret. This type of secret is used to authenticate with a container registry to pull down a private image. We can create this via the commandline. For username, simply use the string `iamapikey`. For `<api_key_value>`, use the api key you made note of earlier.
+
+    ```
+    kubectl --namespace default create secret docker-registry ibm-cr-secret  --docker-server=us.icr.io --docker-username=iamapikey --docker-password=$MYAPIKEY
+    ```
+
+2. We will also need a secret for the build process to have credentials to push the built image to the container registry. To create this secret, we'll first need to base64 encode our username and password for IBM Container Registry. For username, you will use the string `iamapikey`. The base64 encoding of `iamapikey` should be: `aWFtYXBpa2V5` - which is already in the yaml file.  Let's base64 encode our apikey, and copy it.
+
+    ```
+    echo -n $MYAPIKEY | base64 -w0  # Linux
+    echo -n $MYAPIKEY | base64 -b0  # MacOS
+    ```
+
+3. Update the `docker-secret.yaml` file with your base64 encoded password. You can find the password field near the end of the file. Username (`aWFtYXBpa2V5=`) is already provided for you.  Replace `<base_64_encoded_api_key_value>` with your own base64 encoded apikey value, and ensure you've saved the file.
+
+4. Apply the secret to your cluster:
+
+    ```
+    kubectl apply --filename docker-secret.yaml
+    ```
+
+5. A `Service Account` provides an identity for processes that run in a Pod. This Service Account will be used to link the build process for Knative to the Secrets you just created. View the service account file, and notice that it's using the credentials you created earlier for pulling from and pushing to the container registry:
+
+    ```
+    cat service-account.yaml
+    ```
+
+    Example output:
+    ```yaml
+     apiVersion: v1
+     kind: ServiceAccount
+     metadata:
+       name: build-bot
+     secrets:
+     - name: ibm-cr-push-secret
+     imagePullSecrets:
+     - name: ibm-cr-secret
+    ```
+
+
+6. Apply the service account to your cluster:
+
+    ```
+    kubectl apply --filename service-account.yaml
+    ```
+
+Congratulations! You've set up some required credentials that the Tekton Pipeline process will use to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
+
+
+Continue on to [exercise 8](../exercise-8/README.md).

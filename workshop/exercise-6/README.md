@@ -1,86 +1,148 @@
-## (OPTIONAL, FOR ADVANCED USERS) Set up a Private Container Image Registry and Obtain Credentials
+## Knative from the Kubernetes Layer
+Up until this point, we've used the Knative CLI to deploy, update, and interact with our application. While our application is running on Kubernetes, we haven't had to interact with any of the underlying Kubernetes components. If we did want to control or view the application at this layer of the stack, we certainly could.
 
-In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
+Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/docs/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
 
-1. You will need to first create an IBM Container Registry namespace. Let's confirm you're logged in.
+Because Knative is built on top of Kubernetes, we can access all of these resource types from the Kubernetes layer in the stack.
 
-    ```
-    ibmcloud login
-    ```
-
-    When prompted, select your own account, and then enter the number for the region `us-south`.
-
-
-1. Add a namespace to your account. You must create at least one namespace to store images in IBM Cloud Container Registry. Choose a unique name for your first namespace. A namespace is a collection of related repositories (which in turn are made up of individual images). You can create multiple namespaces as well as control access to your namespaces by using IAM policies.
+### Explore Application Deployment Using Kubectl
+1. Our application may have already scaled down to zero. Let's curl the application, and then view the pods our application is running on.
 
     ```
-    ibmcloud cr namespace-add <my_namespace>
+    curl $MY_APP_URL/4
+    ```
+    ```
+    kubectl get pods --watch
     ```
 
-2. Create an API key. This API key can be used to automate pushing and pulling of Docker images to and from your namespaces. The automated build processes you'll be setting up will use this key to access your images.
+    You should see some pods to indicate that your application is running. You may see pods for both versions of your application (-zero and -one). Wait about 90 seconds, and you should see that your application scales back down to zero and the pods terminate due to lack of use. You should eventually see the pods move from the `Running` to the `Terminating` state.
+
+    Example Output:
 
     ```
-    ibmcloud iam api-key-create mykey -d "API key for IBM Cloud"
+    NAME                                                    READY   STATUS      RESTARTS   AGE
+    fib-knative-one-deployment-79d6cb9cbd-v4th5             2/2     Running     0          43s
+    fib-knative-zero-deployment-968c8896-8mhkx              2/2     Running     0          60s
+    fib-knative-one-deployment-79d6cb9cbd-v4th5             2/2     Terminating   0          86s
+    fib-knative-one-deployment-79d6cb9cbd-v4th5             0/2     Terminating   0          96s
+    fib-knative-zero-deployment-968c8896-8mhkx              0/2     Terminating   0          96s
     ```
+   
+    Note: To exit the watch, use `ctrl + c`.
 
-3. The CLI output should include the API Key value. Create an environment variable containing your key.
-
-    ```
-    export MYAPIKEY=<your_api_key_value>
-    ```
-
-### Provide Container Registry Credentials to Cluster
-This lab will need credentials for authenticating to your private container registry. First, we'll need to create a `Secret` to store the credentials for this registry. This secret will be used for the knative-serving component to pull down an image from the container registry.
-
-A `Secret` is a Kubernetes object containing sensitive data such as a password, a token, or a key. You can also read more about [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/).
-
-1. Let's create a secret, which will be a `docker-registry` type secret. This type of secret is used to authenticate with a container registry to pull down a private image. We can create this via the commandline. For username, simply use the string `iamapikey`. For `<api_key_value>`, use the api key you made note of earlier.
+2. We can also view some details about the Configuration for our Service. Every Service has a Configuration and a Route -- each time a Configuration is updated, a new Revision is created. Let's see a list of Configurations, first.
 
     ```
-    kubectl --namespace default create secret docker-registry ibm-cr-secret  --docker-server=us.icr.io --docker-username=iamapikey --docker-password=$MYAPIKEY
+    kubectl get configuration
     ```
 
-2. We will also need a secret for the build process to have credentials to push the built image to the container registry. To create this secret, we'll first need to base64 encode our username and password for IBM Container Registry. For username, you will use the string `iamapikey`. The base64 encoding of `iamapikey` should be: `aWFtYXBpa2V5` - which is already in the yaml file.  Let's base64 encode our apikey, and copy it.
-
+    Example Output:
     ```
-    echo -n $MYAPIKEY | base64 -w0  # Linux
-    echo -n $MYAPIKEY | base64 -b0  # MacOS
-    ```
-
-3. Update the `docker-secret.yaml` file with your base64 encoded password. You can find the password field near the end of the file. Username (`aWFtYXBpa2V5=`) is already provided for you.  Replace `<base_64_encoded_api_key_value>` with your own base64 encoded apikey value, and ensure you've saved the file.
-
-4. Apply the secret to your cluster:
-
-    ```
-    kubectl apply --filename docker-secret.yaml
+    NAME                LATESTCREATED             LATESTREADY               READY   REASON
+    fib-knative         fib-knative-zero          fib-knative-zero          True    
     ```
 
-5. A `Service Account` provides an identity for processes that run in a Pod. This Service Account will be used to link the build process for Knative to the Secrets you just created. View the service account file, and notice that it's using the credentials you created earlier for pulling from and pushing to the container registry:
+3. Next, let's see some of the details of the fib-knative Configuration.    
 
     ```
-    cat service-account.yaml
+    kubectl get configuration fib-knative -o yaml
     ```
 
-    Example output:
-    ```yaml
-     apiVersion: v1
-     kind: ServiceAccount
-     metadata:
-       name: build-bot
-     secrets:
-     - name: ibm-cr-push-secret
-     imagePullSecrets:
-     - name: ibm-cr-secret
+    Example Output:
+    ```
+    apiVersion: serving.knative.dev/v1
+    kind: Configuration
+    metadata:
+      annotations:
+        serving.knative.dev/creator: IAM#beemarie@us.ibm.com
+        serving.knative.dev/lastModifier: IAM#beemarie@us.ibm.com
+      creationTimestamp: "2020-05-18T18:21:10Z"
+      generation: 3
+      labels:
+        serving.knative.dev/route: fib-knative
+        serving.knative.dev/service: fib-knative
+      name: fib-knative
+      namespace: default
+      ownerReferences:
+      - apiVersion: serving.knative.dev/v1alpha1
+        blockOwnerDeletion: true
+        controller: true
+        kind: Service
+        name: fib-knative
+        uid: 8fb26d78-1e95-4140-9a11-d0ca288011e7
+      resourceVersion: "1123399"
+      selfLink: /apis/serving.knative.dev/v1/namespaces/default/configurations/fib-knative
+      uid: d4e043ac-439c-4dc4-90e5-e71d88d1b4ea
+    spec:
+      template:
+        metadata:
+          annotations:
+            client.knative.dev/user-image: docker.io/ibmcom/fib-knative:vnext
+          creationTimestamp: null
+          name: fib-knative-zero
+        spec:
+          containerConcurrency: 0
+          containers:
+          - image: docker.io/ibmcom/fib-knative:vnext
+            name: user-container
+            readinessProbe:
+              successThreshold: 1
+              tcpSocket:
+                port: 0
+            resources: {}
+          timeoutSeconds: 300
+    status:
+      conditions:
+      - lastTransitionTime: "2020-05-18T18:38:33Z"
+        status: "True"
+        type: Ready
+      latestCreatedRevisionName: fib-knative-zero
+      latestReadyRevisionName: fib-knative-zero
+      observedGeneration: 3
+    ```
+    
+    The Configuration shows the desired state for our application. You can see the image that our Service is using, as well as the namespace the Service is in, the status of the Service, and some other configuration information.
+
+4. When creating your Service, some other objects were created in Kubernetes as well, such as Routes or Revisions. Let's check out the Route. In the `traffic` section you can see the two URLs that were created when we tagged the revisions, as well as the percentage of traffic going to each Revision.
+
+    ```
+    kubectl get route fib-knative -o yaml
     ```
 
-
-6. Apply the service account to your cluster:
+    Example Output:
+    ```
+    ...
+      traffic:
+      - latestRevision: false
+        percent: 10
+        revisionName: fib-knative-zero
+        tag: zero
+        url: http://zero-fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
+      - latestRevision: false
+        percent: 90
+        revisionName: fib-knative-one
+        tag: one
+        url: http://one-fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
+      url: http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
+      ```
+5. We can also see a list of Revisions created in Kubernetes:
 
     ```
-    kubectl apply --filename service-account.yaml
+    kubectl get revision
+    ```
+    
+    Example Output:
+    ```
+    NAME                      CONFIG NAME         K8S SERVICE NAME          GENERATION   READY   REASON
+    fib-knative-one           fib-knative         fib-knative-one           2            True    
+    fib-knative-ywvgm-1       fib-knative         fib-knative-ywvgm-1       1            True    
+    fib-knative-zero          fib-knative         fib-knative-zero          3            True    
     ```
 
-Congratulations! You've set up some required credentials that the Tekton Pipeline process will use to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
+6. In the next section, we'll be deploying the same application, but with a different method, so let's clean up our service.
 
+    ```
+    kn service delete fib-knative
+    ```
 
-Continue on to [exercise 7](../exercise-7/README.md).
+Congratulations! You've completed the first part of the Knative 101 lab. You have had a quick overview of deploying applications to Knative using the `kn` CLI as well as using `kubectl` to do some advanced debugging and exploration. You can continue to the advanced portion of this lab with [exercise 7](../exercise-7/README.md) or you can go to the [Knative Eventing Lab](https://github.com/IBM/knative101-eventing) to learn more about the eventing component.

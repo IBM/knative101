@@ -1,24 +1,12 @@
 # Knative 101
 
-In this lab, you'll learn about Knative, a new open source collaboration from IBM, Google, Pivotal, Red Hat, Cisco, and others. You'll create a new cluster on IBM Kubernetes Service (IKS), install Istio & Knative to that cluster, and then deploy a Node.js fibonacci application to Knative.
+In this lab, you'll learn about Knative, a new open source collaboration from IBM, Google, Pivotal, Red Hat, Cisco, and others. Knative is based on the Kubernetes platform and is used for building, deploying, and managing serverless workloads. It enables developers to focus on what really matters by abstracting away many of the underlying details of building, deploying, and managing an application. With Knative, you can serve your applications, manage traffic, autoscale, and react to events. 
 
-Knative is built on top of Istio & Kubernetes, and is a set of primitives for enabling serverless applications on Kubernetes. Knative consists of the Serving and Eventing components. 
+As you work through this lab, you'll create a new cluster on IBM Kubernetes Service (IKS), install Knative on that cluster, and then deploy a Node.js Fibonacci application using Knative. 
 
-Serving supports serving your applications, managing traffic, as well as routing and autoscaling. Eventing enables you to create event producers and consumers for your application.
+We'll use the Knative client, `kn`, which makes interacting with Knative simple and straightforward. We will also explore Tekton Pipelines, a project providing kubernetes-style resources for declaring CI/CD pipelines.
 
-We will also explore Tekton Pipelines, a project providing kubernetes-style resources for declaring CI/CD pipelines.
-
-Two of the key Knative personas are Developers and platform providers. Developers can use Knative directly (or through an API) to build Serverless applications on top of Kubernetes.  Platform providers can use the Knative primitives to build their own Serverless platform on Kubernetes.
-
-![knative personas](README_images/audience.png)
-
-The Knative application you'll create is a fibonacci sequence app. When provided with the number n, it will return the first n numbers of the fibonacci sequence: 1, 1, 2, 3.... You'll also deploy a vnext of the application, which starts the fibonacci sequence with 0 instead of 1: 0, 1, 1, 2, 3.... The application will be given a domain, which you'll be able to curl to get the fibonacci results.
-
-You'll learn to deploy applications using kubectl with a configuration yaml file, as well as to deploy applications using the kn CLI tool. You'll be able to see your application scale up when in use, and then scale back down to zero pods when it's not being used.
-
-You'll also learn to work with revisions and routes, sending some percentage of your traffic to a new revision.
-
-![diagram of the app created in this lab](README_images/knativeappdiagram.png)
+The Knative application you'll create is a Fibonacci sequence app. When provided with the number n, it will return the first n numbers of the Fibonacci sequence: 1, 1, 2, 3.... You'll also deploy a vnext of the application, which starts the Fibonacci sequence with 0 instead of 1: 0, 1, 1, 2, 3.... The application will be given a URL, which you'll be able to curl to get the Fibonacci results. We'll also explore how to route varying percentages of your incoming traffic to each of these versions of the application.
 
 
 Get started with the [workshop](./exercise-0/README.md).

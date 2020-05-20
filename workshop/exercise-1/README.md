@@ -19,7 +19,7 @@ components, the recommended configuration for a cluster is:
     export MYCLUSTER=<your_cluster_name>
     ```
 
-4. Wait while your cluster is fully deployed. Repeat this command until the state of the cluster is `normal`.
+5. Wait while your cluster is fully deployed. Repeat this command until the state of the cluster is `normal`.
 
     ```
     ibmcloud ks clusters | grep $MYCLUSTER

@@ -6,7 +6,7 @@ Knative Serving enables rapid deploying and serving of serverless applications. 
 
 The Knative Service object automatically manages the whole lifecycle for your workload. A Service represents your app on Knative. Services control the creation of other objects to ensure that your app has a URL and a new Revision for each update of the service.
 
-![](https://github.com/knative/serving/raw/master/docs/spec/images/fibknativev1.png)
+![](https://github.com/IBM/knative101/blob/master/workshop/README_images/fibknativev1.png)
 
 ### Deploy our Application to Knative using kn
 We've already created an image on dockerhub that contains the first version of our Fibonacci application. If we call the `/` endpoint, and pass in a `number` parameter, we should get the first `n` numbers of the Fibonacci sequence.

@@ -2,7 +2,7 @@
 
 Did you notice that the Fibonacci sequence started with 1? Many would argue that the sequence should actually start with 0. There's a vnext version of the application that starts the sequence with 0 instead of 1. This container image has been built and deployed to dockerhub, and tagged as vnext. We'll deploy that as v2 of our app, and then route a small percentage of the traffic to it.
 
-![](https://github.com/IBM/knative101/blob/master/workshop/README_images/fibknativev2.png)
+![](../README_images/fibknativev2.png)
 
 ### Update First Revision Name
 1. When we first deployed our application, we didn't provide a revision name, so Knative assigned a random revision name, something like `fib-knative-lhghx-1`. Let's give the service the revision name `fib-knative-one` since in this version of the application the sequence begins with one. Naming our own revisions can be helpful for readability, but isn't required. We'll later use this revision name to route traffic between two different revisions.

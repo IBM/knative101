@@ -2,14 +2,14 @@
 The Knative client, `kn`, aims to make interacting with Knative a seamless experience for developers. In this section we'll try deploying an application using `kn`. The application for this lab is a simple Node.js with Express app which returns the first n numbers of the Fibonacci sequence. Once the app is deployed, you can use it by making a GET request to the `/` endpoint with a number as the parameter. 
 
 ### Our First Knative Service
-Knative Serving enables rapid deploying and serving of serverless applications. Those applications will automatically scale up, and then back down to zero. In this exercise, we'll use the Knative Serving component to deploy our first application from a container image hosted on dockerhub. 
+Knative Serving enables rapid deploying and serving of serverless applications. Those applications will automatically scale up, and then back down to zero as required based on load to the application. In this exercise, we'll use the Knative Serving component to deploy our first application from a container image hosted on dockerhub. 
 
-The Knative Service object automatically manages the whole lifecycle for your workload. A Service represents your app on Knative. Services control the creation of other objects to ensure that your app has a URL and a new Revision for each update of the service.
+The Knative Service object automatically manages the whole lifecycle for your workload. A Service represents your app on Knative. Services control the creation of other objects to ensure that your app has a URL and a new Revision for each update of the Service.
 
 ![](../README_images/fibknativev1.png)
 
 ### Deploy our Application to Knative using kn
-We've already created an image on dockerhub that contains the first version of our Fibonacci application. If we call the `/` endpoint, and pass in a `number` parameter, we should get the first `n` numbers of the Fibonacci sequence.
+We've already created an image on dockerhub that contains the first version of our Fibonacci application. If we call the `/` endpoint, and pass in a number parameter, we should get the first `n` numbers of the Fibonacci sequence.
 
 1. Deploy the application. We will create a Knative Service named fib-knative which will run our fib-knative image on dockerhub.
 

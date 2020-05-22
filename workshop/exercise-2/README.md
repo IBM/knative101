@@ -1,5 +1,5 @@
 ## Setup: Install Knative on Your Cluster
-Knative extends the capabilites of Kubernetes to add components for deploying, running, and managing serverless applications to Kubernetes. The managed Knative add-on for IBM Cloud utilizes Istio under the covers for its networking layer. If you want to learn more about Kubernetes or Istio, you can check out the labs [Kube101](https://github.com/IBM/kube101/tree/master/workshop) and
+Knative extends the capabilites of Kubernetes to add components for deploying, running, and managing serverless applications on Kubernetes. The managed Knative add-on for IBM Cloud utilizes Istio under the covers for its networking layer. If you want to learn more about Kubernetes or Istio, you can check out the labs [Kube101](https://github.com/IBM/kube101/tree/master/workshop) and
 [Istio101](https://github.com/IBM/istio101/tree/master/workshop).
 
 When you install Knative on IKS, it will install Istio for you
@@ -14,7 +14,7 @@ automatically.
     ibmcloud plugin update
     ```
 
-2. Next ask for Knative to be installed on your cluster. The -y flag enables all dependencies for the Knative add-on:
+2. Next ask for Knative to be installed on your cluster. The `-y` flag enables all dependencies for the Knative add-on:
 
     ```
     ibmcloud ks cluster addon enable knative --cluster $MYCLUSTER -y
@@ -49,7 +49,7 @@ automatically.
    Notice the `istio-system` namespace, and the `knative-...` namespaces.
 
    Once the namespaces are there, check to see if all of the Istio and
-   Knative pods are running correctly:
+   Knative pods are in the `Running` or `Completed` state:
 
    ```
    kubectl get pods --namespace istio-system

@@ -1,6 +1,6 @@
 ## (OPTIONAL, FOR ADVANCED USERS) Set up a Private Container Image Registry and Obtain Credentials
 
-In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry. In this exercise, you'll set up your private container image registry and set up credentials for your cluster.
+In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry. In this exercise, you'll set up your private container image registry and set up credentials for your cluster to access that registry.
 
 ### Clone the application repo
 Let's first get the code we'll use for this portion of the lab. This repository contains the code for the Fibonacci application as well as various .yaml files we'll be using.

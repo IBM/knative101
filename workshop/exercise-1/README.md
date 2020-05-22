@@ -6,8 +6,8 @@ This lab requires a standard (paid) cluster. Create a new standard cluster from 
 
 1. To ensure the cluster is large enough to host all the Knative and Istio
 components, the recommended configuration for a cluster is:
-  - Kubernetes version 1.16 or later
-  - 4 vCPU nodes with 16GB memory (`b3c.4x16`)
+    - Kubernetes version 1.16 or later
+    - 4 vCPU nodes with 16GB memory (`b3c.4x16`)
 
 2. Ensure you've chosen a unique name for your cluster.
 

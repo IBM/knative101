@@ -1,5 +1,5 @@
 ## Knative from the Kubernetes Layer
-Up until this point, we've used the Knative CLI to deploy, update, and interact with our application. While our application is running on Kubernetes, we haven't had to interact with any of the underlying Kubernetes components. If we did want to control or view the application at this layer of the stack, we certainly could.
+Up until this point, we've used the Knative CLI, `kn`, to deploy, update, and interact with our application. While our application is running on Kubernetes, we haven't had to interact with any of the underlying Kubernetes components. If we did want to control or view the application at this layer of the stack, we certainly could.
 
 Knative defines some objects for each component as Kubernetes [Custom Resource Definitions](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources)(CRDs). A CRD is used to define a new resource type in Kubernetes. Knative [Serving](https://github.com/knative/docs/tree/master/docs/serving#serving-resources) includes a number of Custom Resource Definitions, including Service, Route, Configuration, and Revision.
 
@@ -45,7 +45,7 @@ Because Knative is built on top of Kubernetes, we can access all of these resour
 3. Next, let's see some of the details of the fib-knative Configuration.    
 
     ```
-    kubectl get configuration fib-knative -o yaml
+    kubectl get configuration fib-knative --output yaml
     ```
 
     Example Output:
@@ -103,7 +103,7 @@ Because Knative is built on top of Kubernetes, we can access all of these resour
     
     The Configuration shows the desired state for our application. You can see the image that our Service is using, as well as the namespace the Service is in, the status of the Service, and some other configuration information.
 
-4. When creating your Service, some other objects were created in Kubernetes as well, such as Routes or Revisions. Let's check out the Route. In the `traffic` section you can see the two URLs that were created when we tagged the revisions, as well as the percentage of traffic going to each Revision.
+4. When creating your Service, some other objects were created in Kubernetes as well, such as Routes or Revisions. Let's check out the Route.
 
     ```
     kubectl get route fib-knative -o yaml
@@ -125,6 +125,9 @@ Because Knative is built on top of Kubernetes, we can access all of these resour
         url: http://one-fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
       url: http://fib-knative-default.bmv-dev-16-5290c8c8e5797924dc1ad5d1b85b37c0-0000.us-south.containers.appdomain.cloud
       ```
+
+      In the `traffic` section you can see the two URLs that were created when we tagged the revisions, as well as the percentage of traffic going to each Revision.
+      
 5. We can also see a list of Revisions created in Kubernetes:
 
     ```

@@ -1,6 +1,6 @@
 ## (OPTIONAL, FOR ADVANCED USERS) Set up a Private Container Image Registry and Obtain Credentials
 
-In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry.
+In the previous exercises, we deployed a container to Knative directly from dockerhub. What if we want to build our own container from source? In this lab, we'll use the [IBM Container Registry](https://cloud.ibm.com/docs/services/Registry?topic=registry-registry_overview#registry_overview) to host our container images since you already have access to this through your IBM Cloud Account. IBM Container Registry enables you to store and distribute container images in a fully managed private registry. In this exercise, you'll set up your private container image registry and set up credentials for your cluster to access that registry.
 
 ### Clone the application repo
 Let's first get the code we'll use for this portion of the lab. This repository contains the code for the Fibonacci application as well as various .yaml files we'll be using.
@@ -52,7 +52,7 @@ This lab will need credentials for authenticating to your private container regi
 
 A `Secret` is a Kubernetes object containing sensitive data such as a password, a token, or a key. You can also read more about [Secrets](https://kubernetes.io/docs/concepts/configuration/secret/).
 
-1. Let's create a secret, which will be a `docker-registry` type secret. This type of secret is used to authenticate with a container registry to pull down a private image. We can create this via the commandline. For username, simply use the string `iamapikey`. For `<api_key_value>`, use the api key you made note of earlier.
+1. Let's create a secret, which will be a `docker-registry` type secret. This type of secret is used to authenticate with a container registry to pull down a private image. We can create this via the commandline. For username, simply use the string `iamapikey`.
 
     ```
     kubectl --namespace default create secret docker-registry ibm-cr-secret  --docker-server=us.icr.io --docker-username=iamapikey --docker-password=$MYAPIKEY
@@ -98,7 +98,7 @@ A `Secret` is a Kubernetes object containing sensitive data such as a password, 
     kubectl apply --filename service-account.yaml
     ```
 
-Congratulations! You've set up some required credentials that the Tekton Pipeline process will use to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
+Congratulations! You've set up some required credentials that the Tekton Pipeline process will need to have access to push to your container image registry. In the next exercise, you will build the image, push it to the registry, and then deploy the app to knative using Tekton Pipelines. The goal of this exercise was to set up some required credentials for that flow.
 
 
 Continue on to [exercise 8](../exercise-8/README.md).

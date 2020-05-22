@@ -10,7 +10,7 @@ A `TaskRun` will run the `Task` that you defined. You can then view output from 
 
 The main goal of Tekton Pipelines is to run your `Task` individually or as a part of a `Pipeline`. Each `Task` runs as a Pod on your Kubernetes cluster with each step as its own container.
 
-A `PipelineResource` is used to define artifacts that are passed into and out of a `Task`. There are a few sytem defined resource types ready to use, such as `git` or `image` resources.  
+A `PipelineResource` is used to define artifacts that are passed into and out of a `Task`. There are a few system defined resource types ready to use, such as `git` or `image` resources.  
 
 ### Create the Required PipelineResources
 

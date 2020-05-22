@@ -1,11 +1,11 @@
 ## Deploy vnext Version and Apply Traffic Shifting
 
-Did you notice that the Fibonacci sequence started with 1? Many would argue that the sequence should actually start with 0. There's a vnext version of the application that starts the sequence with 0 instead of 1. This container image has been built and deployed to dockerhub, and tagged as vnext. We'll deploy that as v2 of our app, and then route a small percentage of the traffic to it.
+Did you notice that the Fibonacci sequence started with 1? Many would argue that the sequence should actually start with 0. There's a vnext version of the application that starts the sequence with 0 instead of 1. This container image has been built, deployed to dockerhub, and tagged as vnext. We'll deploy that as v2 of our app, and then route a small percentage of the traffic to it.
 
 ![](../README_images/fibknativev2.png)
 
 ### Update First Revision Name
-1. When we first deployed our application, we didn't provide a revision name, so Knative assigned a random revision name, something like `fib-knative-lhghx-1`. Let's give the service the revision name `fib-knative-one` since in this version of the application the sequence begins with one. Naming our own revisions can be helpful for readability, but isn't required. We'll later use this revision name to route traffic between two different revisions.
+1. When we first deployed our application, we didn't provide a revision name, so Knative assigned a random revision name, something like `fib-knative-lhghx-1`. Let's give the service the revision name `fib-knative-one` since in this version of the application the sequence begins with one. Naming our own revisions can be helpful for readability, but it isn't required. We'll later use this revision name to route traffic between two different revisions.
 
     ```
     kn service update fib-knative --revision-name fib-knative-one
@@ -64,7 +64,7 @@ Did you notice that the Fibonacci sequence started with 1? Many would argue that
     kn service update fib-knative --traffic fib-knative-zero=10 --traffic fib-knative-one=90
     ```
 
-5. Again, we can use `kn service describe` to see these changes. Notice the revisions section. You can see that 10% of the traffic will be sent to `fib-knative-zero`, and 90% of the traffic will be sent to `fib-knative-one`.
+5. Again, we can use `kn service describe` to see these changes. Notice the `Revisions` section. You can see that 10% of the traffic will be sent to `fib-knative-zero`, and 90% of the traffic will be sent to `fib-knative-one`.
 
     ```
     kn service describe fib-knative

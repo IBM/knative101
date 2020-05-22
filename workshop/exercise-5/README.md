@@ -9,7 +9,7 @@ What if we wanted to create URLs that are specific for each of the two revisions
     kn service update fib-knative --tag fib-knative-zero=zero --tag fib-knative-one=one
     ```
 
-2. By tagging the revisions, we should have created two new URLs, one for each of the revisions. The new URLs will be the same format as your old URL, but with `zero-` or `one-` prepended before the service name in the URL. Let's get the old URL now, and then build the new URLs.
+2. When we tagged the revisions, Knative should have created two new URLs, one for each of the revisions. The new URLs will be the same format as your old URL, but with `zero-` or `one-` prepended before the service name in the URL. Let's get the old URL now, and then build the new URLs.
 
     ```
     echo $MY_APP_URL
